@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html {
+		@apply overflow-y-scroll bg-background text-foreground;
+
+		transition: ease-in-out 0.1s;
+		transition-property: color, border-color;
+	}
+}
+
+@layer components {
+	.button {
+		@apply flex h-[40px] items-center gap-2 rounded-lg border border-inherit bg-foreground p-1.5 font-bold text-inherit transition hover:bg-background hover:text-inherit;
+
+		transition: ease-in-out 0.1s;
+		transition-property: color, border-color, background-color;
+	}
+
+	.border-main {
+		@apply rounded-lg border border-accents2 bg-background;
+	}
+}
+
+@layer utilities {
+	.fixed-top {
+		@apply fixed left-1/2 top-12 -translate-x-1/2 -translate-y-1/2 transform;
+	}
+
+	.fixed-middle {
+		@apply fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform;
+	}
+
+	.fixed-bottom {
+		@apply fixed bottom-0 left-0;
+	}
+
+	.alert {
+		@apply border-alert bg-alert  hover:text-alert;
+	}
+
+	.warn {
+		@apply border-warn bg-warn hover:text-warn;
+	}
+
+	.normal {
+		@apply border-foreground bg-foreground text-background hover:text-foreground;
+	}
+}
