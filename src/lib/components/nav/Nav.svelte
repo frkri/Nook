@@ -1,39 +1,28 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
-	import { createEntry, getEntryHandle, type Entry } from '$lib/client/explorer';
+	import { createEntries, getEntryHandle } from '$lib/client/explorer';
 	import { currentPath } from '$lib/store/currentPath';
 	import { viewType } from '$lib/store/viewType';
 	import { ChevronLeft, File, Folder, LayoutGrid, List, Plus } from 'lucide-svelte';
 	import ActionModal from '../popup/actionModal.svelte';
-
-	let newEntry: Entry = {
-		name: '',
-		icon: '📄',
-		kind: 'file'
-	};
 
 	let dropdownOpen = false;
 	let inputOpen = false;
 
 	let pathInput = '';
 	let pathErrorState = false;
-	currentPath.subscribe((value) => {
-		console.log('Current path changed to: ' + value.path.join('/'));
-		pathInput = '/' + value.resolvedPath.join('/') + '/';
-	});
 
-	async function handleSubmitPath() {
-		await currentPath.setResolvedPath(pathInput);
+	let newEntry: EntryDataBasic = {
+		type: EntryType.File,
+		name: '',
+		icon: '📝'
+	};
 
-		console.log($currentPath.resolvedPath, pathInput.split('/'));
-
-		console.log('Navigating to: "' + $currentPath.path.join('/') + '" based on user input');
-		await goto('/explorer/' + $currentPath.path.join('/'));
-	}
+	async function handleSubmitPath() {}
 </script>
 
 <!-- Entry edit modal -->
-<ActionModal bind:open={inputOpen} title="Create new {newEntry.kind}">
+<ActionModal bind:open={inputOpen} title="Create new {newEntry.type}">
 	<div class="m-3 flex justify-around gap-2">
 		<input
 			bind:value={newEntry.icon}
@@ -44,7 +33,7 @@
 		<input
 			bind:value={newEntry.name}
 			required={true}
-			placeholder={newEntry.kind === 'file' ? 'New Note' : 'New Folder'}
+			placeholder={newEntry.type === 'file' ? 'New Note' : 'New Folder'}
 			class="border-main inline-inline-block min-w-0 flex-1 bg-background p-2 font-bold text-primary placeholder:text-accents4"
 		/>
 	</div>
@@ -61,8 +50,10 @@
 			class="button normal"
 			on:click={async () => {
 				inputOpen = false;
-				const currentDirHandle = await getEntryHandle($currentPath.currentDirID);
-				if (currentDirHandle) await createEntry(newEntry, currentDirHandle);
+				const currentDirHandle = await getEntryHandle(
+					$currentPath.pathData[$currentPath.pathData.length - 1].id
+				);
+				if (currentDirHandle) await createEntries([newEntry], currentDirHandle);
 				invalidate('entries:loader');
 			}}
 		>
@@ -77,7 +68,7 @@
 		role="menuitem"
 		class="flex w-full gap-1 rounded p-2 hover:bg-accents2"
 		on:click={() => {
-			newEntry.kind = 'directory';
+			newEntry.type = EntryType.Directory;
 			inputOpen = true;
 			dropdownOpen = false;
 		}}><Folder class="w-4" />Folder</button
@@ -86,7 +77,7 @@
 		role="menuitem"
 		class="flex w-full gap-1 rounded p-2 hover:bg-accents2"
 		on:click={() => {
-			newEntry.kind = 'file';
+			newEntry.type = EntryType.File;
 			inputOpen = true;
 			dropdownOpen = false;
 		}}><File class="w-4" />Note</button

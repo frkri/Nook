@@ -1,32 +1,25 @@
-import { browser } from '$app/environment';
+import { browser, building } from '$app/environment';
 import { openDB, type DBSchema } from 'idb';
 
 interface NookDB extends DBSchema {
 	entries: {
-		key: string; // ID
-		value: {
-			name: string;
-			icon: string;
-			kind: 'directory' | 'file';
-			id?: string;
-			created?: number;
-			modified?: number;
-			parent?: string;
-		};
-		indexes: { 'by-name': string };
+		key: string;
+		value: EntryData;
+		indexes: { 'name-index': string };
 	};
 }
 
 async function initDB(dbName: string, dbVersion: number) {
-	if (!browser) return;
+	//if (!browser) throw new Error("IndexedDB isn't available in this environment");
+	if (building || !browser) return;
 
 	const db = await openDB<NookDB>(dbName, dbVersion, {
 		upgrade(db) {
 			const store = db.createObjectStore('entries', {
 				keyPath: 'id',
-				autoIncrement: false // Using UUIDs
+				autoIncrement: false
 			});
-			store.createIndex('by-name', 'name');
+			store.createIndex('name-index', 'name');
 		}
 	});
 

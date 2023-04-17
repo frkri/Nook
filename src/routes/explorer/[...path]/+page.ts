@@ -1,46 +1,24 @@
-import { getEntriesByID, getEntryHandle, type Entry } from '$lib/client/explorer';
+import { getEntriesByID, getEntryHandle } from '$lib/client/explorer';
+import { iterToArray } from '$lib/client/utils';
+import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
-// This route cannot be prerendered
-export const prerender = false;
-
 export const load = (async ({ params, depends }) => {
-	// Allows force refresh of Entries on new or removed entries
+	// Allows force refresh on create or remove events
 	depends('entries:loader');
 
-	const dirEntries: Array<Entry> = [];
-	const fileEntries: Array<Entry> = [];
-
-	const currDirID = params.path.split('/').pop();
-	console.log('Fetching entries for', currDirID || 'root');
-
+	const currDirID = params.path.split('/').pop() || 'root';
 	const currDirHandle = await getEntryHandle(currDirID);
-	if (!currDirHandle)
-		return {
-			dirEntries,
-			fileEntries
-		};
 
-	const entriesIDs: string[] = [];
+	// Show 404 if entry not found
+	if (!currDirHandle) throw error(404, 'Entry not found');
+	if (currDirHandle.kind !== 'directory') throw error(404, 'Entry is not a directory');
 
-	for await (const ID of currDirHandle.keys()) {
-		entriesIDs.push(ID);
-	}
+	// Get entries of current Directory
+	const reslovedEntries = await getEntriesByID(await iterToArray(currDirHandle.keys()));
 
-	const Entries = getEntriesByID(entriesIDs);
-
-	for await (const entry of await Entries) {
-		if (!entry) {
-			console.error(`Failed to find ${entry}`);
-			continue;
-		}
-
-		if (entry.kind === 'directory') {
-			dirEntries.push(entry);
-		} else if (entry.kind === 'file') {
-			fileEntries.push(entry);
-		}
-	}
+	const dirEntries = reslovedEntries.filter((entry) => entry.type === 'directory');
+	const fileEntries = reslovedEntries.filter((entry) => entry.type === 'file');
 
 	return {
 		dirEntries,
