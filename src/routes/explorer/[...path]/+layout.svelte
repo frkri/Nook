@@ -6,7 +6,7 @@
 	// Sets the current path from page params
 	$: currentPath.setPathFromID($page.params.path.split('/') || ['']);
 
-	console.log($currentPath.pathData);
+	//$: console.log($currentPath.pathData, $page.params.path.split('/'));
 </script>
 
 <svelte:head>

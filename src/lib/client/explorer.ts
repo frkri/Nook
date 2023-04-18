@@ -17,7 +17,7 @@ const handleCache = new Map<string, FileSystemDirectoryHandle>();
  * @param ids
  * @returns Array with resolved Entries, or null if not found
  */
-export async function getEntriesByID(ids: string[]): Promise<EntryData[]> {
+export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[]> {
 	// Open new transaction
 	const tx = db.transaction('entries', 'readonly');
 
@@ -49,7 +49,7 @@ export async function getEntriesByID(ids: string[]): Promise<EntryData[]> {
 
 	tx.commit();
 	// Filter out null entries
-	return entries.filter((entry) => entry !== null) as EntryData[];
+	return entries;
 }
 
 /**
@@ -57,7 +57,7 @@ export async function getEntriesByID(ids: string[]): Promise<EntryData[]> {
  * @param names
  * @returns Array with resolved Entries, or null if not found
  */
-export async function getEntriesByName(names: string[]): Promise<EntryData[]> {
+export async function getEntriesByName(names: string[]): Promise<(EntryData | null)[]> {
 	// Open new transaction
 	const tx = db.transaction('entries', 'readonly');
 	const index = tx.store.index('name-index');
@@ -90,7 +90,7 @@ export async function getEntriesByName(names: string[]): Promise<EntryData[]> {
 
 	tx.commit();
 	// Filter out null entries
-	return entries.filter((entry) => entry !== null) as EntryData[];
+	return entries;
 }
 
 /**

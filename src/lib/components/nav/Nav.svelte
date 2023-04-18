@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
-	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
+	import { createEntries, getDirEntryHandle, getEntriesByName } from '$lib/client/explorer';
 	import { currentPath } from '$lib/store/currentPath';
 	import { viewType } from '$lib/store/viewType';
 	import { ChevronLeft, File, Folder, LayoutGrid, List, Plus } from 'lucide-svelte';
@@ -9,8 +9,7 @@
 	let dropdownOpen = false;
 	let inputOpen = false;
 
-	let pathInput = '';
-	let pathErrorState = false;
+	let pathInput = $currentPath.pathID.join('/');
 
 	enum EntryType {
 		Directory = 'directory',
@@ -22,8 +21,6 @@
 		name: '',
 		icon: '📝'
 	};
-
-	async function handleSubmitPath() {}
 </script>
 
 <!-- Entry edit modal -->
@@ -56,7 +53,7 @@
 			on:click={async () => {
 				inputOpen = false;
 				const currentDirHandle = await getDirEntryHandle($currentPath.currentDirID);
-				console.log(currentDirHandle);
+				console.log($currentPath.currentDirID, currentDirHandle);
 				await createEntries([newEntry], currentDirHandle);
 				invalidate('entries:loader');
 			}}
@@ -105,9 +102,13 @@
 			</button>
 			<input
 				class="flex-1 bg-background outline-none"
-				class:text-warn={pathErrorState}
 				bind:value={pathInput}
-				on:change={handleSubmitPath}
+				on:change={() => {
+					console.log(pathInput.split('/'));
+					currentPath.setPathFromName(pathInput.split('/'));
+					goto('/explorer/' + $currentPath.pathID.join('/'));
+				}}
+				autocomplete="false"
 				type="text"
 				name="path"
 			/>
