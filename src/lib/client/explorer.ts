@@ -142,7 +142,7 @@ export async function getDirEntryHandle(
 	if (currentDirHandle === undefined) currentDirHandle = await navigator.storage.getDirectory();
 
 	// Diff
-	if (id === 'root' || id === "") return currentDirHandle;
+	if (id === 'root' || id === '') return currentDirHandle;
 
 	// Check cache for handle
 	let handle = handleCache.get(id);
@@ -162,4 +162,30 @@ export async function getDirEntryHandle(
 	}
 
 	return undefined;
+}
+
+export async function removeEntries(
+	ids: string[],
+	currentDirHandle?: FileSystemDirectoryHandle
+): Promise<void> {
+	// Get root directory handle if not provided
+	if (!currentDirHandle) currentDirHandle = await navigator.storage.getDirectory();
+
+	// Open new transaction
+	const tx = db.transaction('entries', 'readwrite');
+
+	for await (const id of ids) {
+		// Remove entry from database
+		await tx.store.delete(id);
+
+		// Remove entry from current directory & remove from cache
+		const handle = await walkDirectory(currentDirHandle, id);
+		if (handle) {
+			await handle.removeEntry(id, { recursive: true });
+			handleCache.delete(id);
+		}
+
+		// Remove entry from cache
+		entryCache.delete(id);
+	}
 }
