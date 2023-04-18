@@ -2,9 +2,9 @@
 
 ⚠️ Learning Project! ⚠️
 
-Basic notetaking app made with [SvelteKit](https://kit.svelte.dev), which has an editor with markdown support and an explorer with a file system-like browser.
+Basic notetaking app (clientside) made with [SvelteKit](https://kit.svelte.dev), which has an _editor_ with markdown support and an explorer with a file system-like browser.
 
-It uses [OPFS](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API#origin_private_file_system) and [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for storage
+It uses [OPFS](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API#origin_private_file_system) and [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for storage.
 
 Design based on [Geist](https://github.com/geist-org/geist-ui), originating from [Vercel's design system](https://vercel.com/design/introduction).
 
