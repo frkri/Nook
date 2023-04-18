@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { removeEntryByID } from '$lib/client/explorer';
+	//import { removeEntryByID } from '$lib/client/explorer';
 	import { viewType } from '$lib/store/viewType.js';
 	import { Edit, Trash } from 'lucide-svelte';
 	import ConfirmAction from '../popup/actionModal.svelte';
@@ -31,7 +31,7 @@
 			class="button alert"
 			on:click={() => {
 				if (!id) return;
-				removeEntryByID(id);
+				//removeEntryByID(id);
 				invalidate('entries:loader');
 				modalConfirm = false;
 			}}

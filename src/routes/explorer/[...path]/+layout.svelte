@@ -4,11 +4,13 @@
 	import { currentPath } from '$lib/store/currentPath';
 
 	// Sets the current path from page params
-	$: currentPath.setPathFromID($page.params.path.split('/'));
+	$: currentPath.setPathFromID($page.params.path.split('/') || ['']);
+
+	console.log($currentPath.pathData);
 </script>
 
 <svelte:head>
-	<title>{$currentPath.pathData[$currentPath.pathData.length - 1].name} - Explorer</title>
+	<title>{$currentPath.currentDirID} - Explorer</title>
 </svelte:head>
 
 <Nav />

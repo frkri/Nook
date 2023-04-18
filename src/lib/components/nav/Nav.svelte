@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
-	import { createEntries, getEntryHandle } from '$lib/client/explorer';
+	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
 	import { currentPath } from '$lib/store/currentPath';
 	import { viewType } from '$lib/store/viewType';
 	import { ChevronLeft, File, Folder, LayoutGrid, List, Plus } from 'lucide-svelte';
@@ -11,6 +11,11 @@
 
 	let pathInput = '';
 	let pathErrorState = false;
+
+	enum EntryType {
+		Directory = 'directory',
+		File = 'file'
+	}
 
 	let newEntry: EntryDataBasic = {
 		type: EntryType.File,
@@ -33,7 +38,7 @@
 		<input
 			bind:value={newEntry.name}
 			required={true}
-			placeholder={newEntry.type === 'file' ? 'New Note' : 'New Folder'}
+			placeholder={newEntry.type === EntryType.File ? 'New Note' : 'New Folder'}
 			class="border-main inline-inline-block min-w-0 flex-1 bg-background p-2 font-bold text-primary placeholder:text-accents4"
 		/>
 	</div>
@@ -50,10 +55,9 @@
 			class="button normal"
 			on:click={async () => {
 				inputOpen = false;
-				const currentDirHandle = await getEntryHandle(
-					$currentPath.pathData[$currentPath.pathData.length - 1].id
-				);
-				if (currentDirHandle) await createEntries([newEntry], currentDirHandle);
+				const currentDirHandle = await getDirEntryHandle($currentPath.currentDirID);
+				console.log(currentDirHandle);
+				await createEntries([newEntry], currentDirHandle);
 				invalidate('entries:loader');
 			}}
 		>
@@ -94,7 +98,7 @@
 			<button
 				class="button normal"
 				on:click={() => {
-					goto('/explorer/' + $currentPath.path.slice(0, -1).join('/'));
+					goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
 				}}
 			>
 				<ChevronLeft />

@@ -10,7 +10,7 @@ const entryCache = new Map<string, EntryData>();
 /**
  * Key-Value cache for handles
  */
-const handleCache = new Map<string, FileSystemHandleUnion>();
+const handleCache = new Map<string, FileSystemDirectoryHandle>();
 
 /**
  * Get multiple entries from the database using IDs
@@ -96,7 +96,7 @@ export async function getEntriesByName(names: string[]): Promise<EntryData[]> {
 /**
  * Creates multiple new Entries in the current directory
  * @param newEntry
- * @param currentDirHandle
+ * @param currentDirHandle Stays Root if not provided
  * @returns The created entry
  */
 export async function createEntries(
@@ -105,6 +105,8 @@ export async function createEntries(
 ) {
 	// Get root directory handle if not provided
 	if (!currentDirHandle) currentDirHandle = await navigator.storage.getDirectory();
+
+	console.log('Creating entries', newEntries, 'in', currentDirHandle);
 
 	// Open new transaction
 	const tx = db.transaction('entries', 'readwrite');
@@ -129,15 +131,18 @@ export async function createEntries(
 		handleCache.set(entry.id, handle);
 	}
 
-	tx.commit();
+	return newEntries;
 }
 
-export async function getEntryHandle(
+export async function getDirEntryHandle(
 	id: string,
 	currentDirHandle?: FileSystemDirectoryHandle
-): Promise<FileSystemDirectoryHandle | FileSystemFileHandle | undefined> {
+): Promise<FileSystemDirectoryHandle | undefined> {
 	// Get root directory handle if not provided
-	if (currentDirHandle == undefined) currentDirHandle = await navigator.storage.getDirectory();
+	if (currentDirHandle === undefined) currentDirHandle = await navigator.storage.getDirectory();
+
+	// Diff
+	if (id === 'root' || id === "") return currentDirHandle;
 
 	// Check cache for handle
 	let handle = handleCache.get(id);

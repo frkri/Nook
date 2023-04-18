@@ -4,12 +4,14 @@ import { writable } from 'svelte/store';
 interface currentPath {
 	pathData: EntryData[]; // Path with EntryData objects
 	pathID: string[]; // path with IDs
+	currentDirID: string; // Current directory ID
 }
 
 function createPathStore() {
 	const { subscribe, set } = writable<currentPath>({
 		pathData: [],
-		pathID: []
+		pathID: [],
+		currentDirID: 'root'
 	});
 
 	return {
@@ -19,7 +21,8 @@ function createPathStore() {
 			getEntriesByID(path).then((entries) => {
 				set({
 					pathData: entries,
-					pathID: path
+					pathID: path,
+					currentDirID: path[path.length - 1]
 				});
 			});
 		}
