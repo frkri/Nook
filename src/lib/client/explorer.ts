@@ -48,7 +48,6 @@ export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[
 	);
 
 	tx.commit();
-	// Filter out null entries
 	return entries;
 }
 
@@ -89,8 +88,38 @@ export async function getEntriesByName(names: string[]): Promise<(EntryData | nu
 	);
 
 	tx.commit();
-	// Filter out null entries
 	return entries;
+}
+
+/**
+ * Helper function to resolve entries using IDs
+ * Meant to be used with a path array and to verify whether the path exists
+ * @param Array of IDs
+ * @returns Array of entries data until and excluding the first null entry
+ */
+export async function resolveEntriesByID(path: string[]): Promise<EntryData[]> {
+	const entries = await getEntriesByID(path);
+	const resolvedPath = entries.splice(
+		0,
+		entries.indexOf(null) === -1 ? entries.length : entries.indexOf(null)
+	) as EntryData[];
+	return resolvedPath;
+}
+
+/**
+ * Helper function to resolve entries using names
+ * Meant to be used with a path array and to verify whether the path exists
+ * @param Array of IDs
+ * @returns Array of entries data until and excluding the first null entry
+ */
+export async function resolveEntriesByName(path: string[]): Promise<EntryData[]> {
+	const entries = await getEntriesByName(path);
+	// Matches up to the first null entry
+	const resolvedPath = entries.splice(
+		0,
+		entries.indexOf(null) === -1 ? entries.length : entries.indexOf(null)
+	) as EntryData[];
+	return resolvedPath;
 }
 
 /**

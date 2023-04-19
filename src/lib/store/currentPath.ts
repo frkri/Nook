@@ -1,9 +1,9 @@
-import { getEntriesByID, getEntriesByName } from '$lib/client/explorer';
+import { resolveEntriesByID, resolveEntriesByName } from '$lib/client/explorer';
 import { writable } from 'svelte/store';
 
 interface currentPath {
 	pathData: EntryData[]; // Path with EntryData objects
-	pathID: string[]; // path with IDs
+	pathID: string[]; // Path with IDs
 	currentDirID: string; // Current directory ID
 }
 
@@ -17,27 +17,24 @@ function createPathStore() {
 	return {
 		subscribe,
 		setPathFromID: (path: string[]) => {
-			getEntriesByID(path).then((entries) => {
-				const resolvedPathData = entries.splice(0, entries.indexOf(null)) as EntryData[];
-				const resolvedPathIDs = resolvedPathData.map((entry) => entry.id);
-
-				console.log('temp', resolvedPathData, resolvedPathIDs);
+			resolveEntriesByID(path).then((entries) => {
+				// New array with only the ID of the entries
+				const resolvedPathIDs = entries.map((entry) => entry.id);
 
 				set({
-					pathData: resolvedPathData,
+					pathData: entries,
 					pathID: resolvedPathIDs,
 					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || ''
 				});
 			});
 		},
 		setPathFromName: (path: string[]) => {
-			getEntriesByName(path).then((entries) => {
-				const resolvedPathData = entries.splice(0, entries.indexOf(null)) as EntryData[];
-				const resolvedPathIDs = resolvedPathData.map((entry) => entry.id);
+			resolveEntriesByName(path).then((entries) => {
+				// New array with only the ID of the entries
+				const resolvedPathIDs = entries.map((entry) => entry.id);
 
-				console.log(resolvedPathData, resolvedPathIDs);
 				set({
-					pathData: resolvedPathData,
+					pathData: entries,
 					pathID: resolvedPathIDs,
 					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || ''
 				});
