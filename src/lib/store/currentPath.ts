@@ -5,13 +5,15 @@ interface currentPath {
 	pathData: EntryData[]; // Path with EntryData objects
 	pathID: string[]; // Path with IDs
 	currentDirID: string; // Current directory ID
+	currentDirName: string; // Current directory name
 }
 
 function createPathStore() {
 	const { subscribe, set } = writable<currentPath>({
 		pathData: [],
 		pathID: [],
-		currentDirID: ''
+		currentDirID: '',
+		currentDirName: ''
 	});
 
 	return {
@@ -24,7 +26,8 @@ function createPathStore() {
 				set({
 					pathData: entries,
 					pathID: resolvedPathIDs,
-					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || ''
+					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
+					currentDirName: entries[entries.length - 1]?.name || ''
 				});
 			});
 		},
@@ -36,7 +39,8 @@ function createPathStore() {
 				set({
 					pathData: entries,
 					pathID: resolvedPathIDs,
-					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || ''
+					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
+					currentDirName: entries[entries.length - 1]?.name || ''
 				});
 			});
 		}

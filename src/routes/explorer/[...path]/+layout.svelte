@@ -5,12 +5,10 @@
 
 	// Sets the current path from page params
 	$: currentPath.setPathFromID($page.params.path.split('/') || ['']);
-
-	//$: console.log($currentPath.pathData, $page.params.path.split('/'));
 </script>
 
 <svelte:head>
-	<title>{$currentPath.currentDirID} - Explorer</title>
+	<title>{$currentPath.currentDirName} - Explorer</title>
 </svelte:head>
 
 <Nav />

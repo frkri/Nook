@@ -15,7 +15,7 @@ const handleCache = new Map<string, FileSystemDirectoryHandle>();
 /**
  * Get multiple entries from the database using IDs
  * @param ids
- * @returns Array with resolved Entries, or null if not found
+ * @returns Array with Entries, or null if not found
  */
 export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[]> {
 	// Open new transaction
@@ -170,7 +170,7 @@ export async function getDirEntryHandle(
 	// Get root directory handle if not provided
 	if (currentDirHandle === undefined) currentDirHandle = await navigator.storage.getDirectory();
 
-	// Diff
+	// Chrome and Firefox have different names for the root directory
 	if (id === 'root' || id === '') return currentDirHandle;
 
 	// Check cache for handle
@@ -193,17 +193,26 @@ export async function getDirEntryHandle(
 	return undefined;
 }
 
+/**
+ * Removes multiple entries by IDs from the current directory
+ * @param ids Array of IDs
+ * @param currentDirHandle Root if not provided
+ */
 export async function removeEntries(
 	ids: string[],
 	currentDirHandle?: FileSystemDirectoryHandle
 ): Promise<void> {
 	// Get root directory handle if not provided
-	if (!currentDirHandle) currentDirHandle = await navigator.storage.getDirectory();
+	if (!currentDirHandle)
+		currentDirHandle = (await navigator.storage.getDirectory()) as FileSystemDirectoryHandle;
 
 	// Open new transaction
 	const tx = db.transaction('entries', 'readwrite');
 
 	for await (const id of ids) {
+		// Remove entry from cache
+		entryCache.delete(id);
+
 		// Remove entry from database
 		await tx.store.delete(id);
 
@@ -213,8 +222,5 @@ export async function removeEntries(
 			await handle.removeEntry(id, { recursive: true });
 			handleCache.delete(id);
 		}
-
-		// Remove entry from cache
-		entryCache.delete(id);
 	}
 }

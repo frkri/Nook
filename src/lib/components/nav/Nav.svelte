@@ -9,7 +9,7 @@
 	let dropdownOpen = false;
 	let inputOpen = false;
 
-	let pathInput = $currentPath.pathID.join('/');
+	let pathInput = $currentPath.pathData.map((path) => path.name).join('/') + '/';
 
 	enum EntryType {
 		Directory = 'directory',
@@ -53,7 +53,6 @@
 			on:click={async () => {
 				inputOpen = false;
 				const currentDirHandle = await getDirEntryHandle($currentPath.currentDirID);
-				console.log($currentPath.currentDirID, currentDirHandle);
 				await createEntries([newEntry], currentDirHandle);
 				invalidate('entries:loader');
 			}}
@@ -104,11 +103,11 @@
 				class="flex-1 bg-background outline-none"
 				bind:value={pathInput}
 				on:change={() => {
-					console.log(pathInput.split('/'));
 					currentPath.setPathFromName(pathInput.split('/'));
+					console.log(pathInput.split('/'), $currentPath.pathID);
 					goto('/explorer/' + $currentPath.pathID.join('/'));
 				}}
-				autocomplete="false"
+				autocorrect="false"
 				type="text"
 				name="path"
 			/>
