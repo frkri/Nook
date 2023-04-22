@@ -21,14 +21,14 @@
 	<Portal target="#portal-target">
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
-			class="fixed bottom-0 left-0 flex w-screen h-screen justify-center items-end p-5 z-10 bg-background bg-opacity-40"
+			class="fixed bottom-0 left-0 z-10 flex h-screen w-screen items-end justify-center bg-background bg-opacity-40 p-5"
 			on:click={(e) => {
 				if (e.target === e.currentTarget) {
 					open = false;
 				}
 			}}
 		>
-			<div class="border-main flex h-56 flex-col justify-around p-3 md:w-1/2 bg-background">
+			<div class="border-main flex h-56 flex-col justify-around bg-background p-3 md:w-1/2">
 				{#if title}
 					<h2 class="border-b text-xl font-bold">{title}</h2>
 				{/if}
