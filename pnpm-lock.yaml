@@ -7,6 +7,9 @@ dependencies:
   lucide-svelte:
     specifier: ^0.129.0
     version: 0.129.0(svelte@3.58.0)
+  svelte-portal:
+    specifier: ^2.2.0
+    version: 2.2.0
 
 devDependencies:
   '@sveltejs/adapter-vercel':
@@ -2433,6 +2436,10 @@ packages:
     dependencies:
       svelte: 3.58.0
     dev: true
+
+  /svelte-portal@2.2.0:
+    resolution: {integrity: sha512-jhtZWtD6cUE2nMw46dJ5VXWYiqnER+JH+V/BmNBQ5fNP/YdsJCpJi+DemUy9msklqGb0f+wLhJPBtKHLWQvzjg==}
+    dev: false
 
   /svelte-preprocess@5.0.3(postcss@8.4.23)(svelte@3.58.0)(typescript@5.0.4):
     resolution: {integrity: sha512-GrHF1rusdJVbOZOwgPWtpqmaexkydznKzy5qIC2FabgpFyKN57bjMUUUqPRfbBXK5igiEWn1uO/DXsa2vJ5VHA==}
