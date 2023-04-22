@@ -18,30 +18,30 @@ function createPathStore() {
 
 	return {
 		subscribe,
-		setPathFromID: (path: string[]) => {
-			resolveEntriesByID(path).then((entries) => {
-				// New array with only the ID of the entries
-				const resolvedPathIDs = entries.map((entry) => entry.id);
+		setPathFromID: async (path: string[]) => {
+			const entries = await resolveEntriesByID(path);
+			console.log('got entries', entries);
+			// New array with only the ID of the entries
+			const resolvedPathIDs = entries.map((entry) => entry.id);
 
-				set({
-					pathData: entries,
-					pathID: resolvedPathIDs,
-					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
-					currentDirName: entries[entries.length - 1]?.name || ''
-				});
+			set({
+				pathData: entries,
+				pathID: resolvedPathIDs,
+				currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
+				currentDirName: entries[entries.length - 1]?.name || ''
 			});
 		},
-		setPathFromName: (path: string[]) => {
-			resolveEntriesByName(path).then((entries) => {
-				// New array with only the ID of the entries
-				const resolvedPathIDs = entries.map((entry) => entry.id);
+		setPathFromName: async (path: string[]) => {
+			const entries = await resolveEntriesByName(path);
+			console.log('got entries', entries);
+			// New array with only the ID of the entries
+			const resolvedPathIDs = entries.map((entry) => entry.id);
 
-				set({
-					pathData: entries,
-					pathID: resolvedPathIDs,
-					currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
-					currentDirName: entries[entries.length - 1]?.name || ''
-				});
+			set({
+				pathData: entries,
+				pathID: resolvedPathIDs,
+				currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
+				currentDirName: entries[entries.length - 1]?.name || ''
 			});
 		}
 	};

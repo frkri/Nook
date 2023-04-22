@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import Item from '$lib/components/entries/Item.svelte';
 	import { viewType } from '$lib/store/viewType';
 
@@ -23,9 +22,7 @@
 		class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] flex-col gap-2 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(450px,1fr))]"
 	>
 		{#each dirEntries as item (item.id)}
-			<a href={$page.url.pathname + '/' + item.id}>
-				<Item id={item.id} title={item.name} emoji={item.icon} />
-			</a>
+			<Item id={item.id} title={item.name} icon={item.icon} />
 		{/each}
 	</div>
 	<div
@@ -38,7 +35,7 @@
 			<Item
 				id={item.id}
 				title={item.name}
-				emoji={item.icon}
+				icon={item.icon}
 				description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nisi vero eligendi dignissimos nostrum laboriosam neque."
 			/>
 		{/each}

@@ -1,16 +1,18 @@
 interface EntryDataBasic {
 	name: string;
-	icon: string; // Image URL
+	icon: string;
 	type: EntryType;
 }
 
 interface EntryData extends EntryDataBasic {
 	id: string; // UUID
-	created: number;
-	modified: number;
+	created: number; // Timestamp
+	modified: number; // Timestamp
 }
 
-enum EntryType {
-	Directory = 'directory',
-	File = 'file'
-}
+const EntryType = {
+	Directory: 'directory',
+	File: 'file'
+} as const;
+
+type EntryType = (typeof EntryType)[keyof typeof EntryType];

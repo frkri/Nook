@@ -1,21 +1,22 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { removeEntries } from '$lib/client/explorer';
+	import { page } from '$app/stores';
+	import { getDirEntryHandle, removeEntries } from '$lib/client/explorer';
 	import { viewType } from '$lib/store/viewType.js';
 	import { Edit, Trash } from 'lucide-svelte';
-	import ConfirmAction from '../popup/actionModal.svelte';
+	import ActionModal from '../popup/actionModal.svelte';
 
-	export let id: string | undefined;
+	export let id: string;
 	export let title: string;
-	export let emoji: string;
+	export let icon: string;
 	export let description: string | null = null;
 
 	let editMode = false;
 	let modalConfirm = false;
 </script>
 
-<ConfirmAction bind:open={modalConfirm} title="Delete {description ? 'Note' : 'Folder'}">
-	<p>
+<ActionModal bind:open={modalConfirm} title="Delete {description ? 'Note' : 'Folder'}">
+	<p class="line-clamp-3">
 		Are you sure you want to delete <span class="font-bold">{title}</span> and all of its contents?
 	</p>
 	<div class="flex justify-around">
@@ -30,45 +31,45 @@
 		<button
 			class="button alert"
 			on:click={async () => {
-				if (!id) return;
-				await removeEntries([id]);
-				invalidate('entries:loader');
 				modalConfirm = false;
+				await removeEntries([id], await getDirEntryHandle(id));
+				invalidate('entries:loader');
 			}}
 		>
 			Confirm
 		</button>
 	</div>
-</ConfirmAction>
+</ActionModal>
 
 <div
 	class="group flex w-full cursor-pointer flex-col gap-2 rounded-lg border border-accents2 p-3 hover:border-accents5"
 >
 	<header class="flex items-center gap-3">
-		<div
-			class="inline-flex w-9 items-center justify-center rounded-lg bg-accents2 p-1 text-xl sm:text-2xl"
-		>
-			{emoji}
-		</div>
-		<span class="line-clamp-2 flex-1 bg-background font-bold text-primary">
-			{title}
-		</span>
-		<Edit
+		<a href={$page.url.pathname + '/' + id} class="flex flex-1 items-center gap-3">
+			<span class="inline-flex w-9 items-center justify-center rounded-lg bg-accents2 p-1 text-xl">
+				{icon}
+			</span>
+			<h3 class="line-clamp-1 w-5 flex-1 bg-background font-bold text-primary">
+				{title}
+			</h3>
+		</a>
+		<button
+			class="hidden group-focus-within:inline-block group-hover:inline-block"
 			on:click={() => {
-				!editMode;
+				editMode = !editMode;
 			}}
 			tabindex={0}
-			class="hidden stroke-accents2 transition hover:stroke-primary group-hover:inline-block"
-		/>
+		>
+			<Edit class="stroke-accents2 transition hover:stroke-primary" />
+		</button>
 		<button
+			class="hidden group-focus-within:inline-block group-hover:inline-block"
 			on:click={() => {
 				modalConfirm = true;
 			}}
 			tabindex={0}
 		>
-			<Trash
-				class="hidden stroke-accents2 transition hover:stroke-primary group-focus-within:inline-block group-hover:inline-block"
-			/>
+			<Trash class="stroke-accents2 transition hover:stroke-primary" />
 		</button>
 	</header>
 	{#if description && $viewType}

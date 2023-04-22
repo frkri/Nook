@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
-	import { createEntries, getDirEntryHandle, getEntriesByName } from '$lib/client/explorer';
+	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
 	import { currentPath } from '$lib/store/currentPath';
 	import { viewType } from '$lib/store/viewType';
 	import { ChevronLeft, File, Folder, LayoutGrid, List, Plus } from 'lucide-svelte';
@@ -9,17 +9,15 @@
 	let dropdownOpen = false;
 	let inputOpen = false;
 
-	let pathInput = $currentPath.pathData.map((path) => path.name).join('/') + '/';
-
-	enum EntryType {
-		Directory = 'directory',
-		File = 'file'
-	}
+	let pathInput = '';
+	currentPath.subscribe(async (path) => {
+		pathInput = path.pathData.map((path) => path.name).join('/');
+	});
 
 	let newEntry: EntryDataBasic = {
-		type: EntryType.File,
+		type: 'file',
 		name: '',
-		icon: '📝'
+		icon: ''
 	};
 </script>
 
@@ -30,12 +28,13 @@
 			bind:value={newEntry.icon}
 			required={true}
 			maxlength="2"
-			class="inline-flex w-9 items-center justify-center rounded-lg bg-accents2 p-1 text-xl sm:text-2xl"
+			class="inline-flex w-9 items-center justify-center rounded-lg bg-accents2 p-1 text-xl"
 		/>
 		<input
 			bind:value={newEntry.name}
 			required={true}
-			placeholder={newEntry.type === EntryType.File ? 'New Note' : 'New Folder'}
+			maxlength="25"
+			placeholder={newEntry.type === 'file' ? 'New Note' : 'New Folder'}
 			class="border-main inline-inline-block min-w-0 flex-1 bg-background p-2 font-bold text-primary placeholder:text-accents4"
 		/>
 	</div>
@@ -52,9 +51,8 @@
 			class="button normal"
 			on:click={async () => {
 				inputOpen = false;
-				const currentDirHandle = await getDirEntryHandle($currentPath.currentDirID);
-				await createEntries([newEntry], currentDirHandle);
-				invalidate('entries:loader');
+				await createEntries([newEntry], await getDirEntryHandle($currentPath.currentDirID));
+				await invalidate('entries:loader');
 			}}
 		>
 			Create
@@ -62,13 +60,15 @@
 	</div>
 </ActionModal>
 
-<!-- Entry creation dropdown -->
+<!-- Entry creation type picker dropdown -->
 <ActionModal bind:open={dropdownOpen}>
 	<button
 		role="menuitem"
 		class="flex w-full gap-1 rounded p-2 hover:bg-accents2"
 		on:click={() => {
-			newEntry.type = EntryType.Directory;
+			newEntry.type = 'directory';
+			newEntry.icon = '📁';
+
 			inputOpen = true;
 			dropdownOpen = false;
 		}}><Folder class="w-4" />Folder</button
@@ -77,7 +77,9 @@
 		role="menuitem"
 		class="flex w-full gap-1 rounded p-2 hover:bg-accents2"
 		on:click={() => {
-			newEntry.type = EntryType.File;
+			newEntry.type = 'file';
+			newEntry.icon = '📝';
+
 			inputOpen = true;
 			dropdownOpen = false;
 		}}><File class="w-4" />Note</button
@@ -102,10 +104,14 @@
 			<input
 				class="flex-1 bg-background outline-none"
 				bind:value={pathInput}
-				on:change={() => {
-					currentPath.setPathFromName(pathInput.split('/'));
-					console.log(pathInput.split('/'), $currentPath.pathID);
-					goto('/explorer/' + $currentPath.pathID.join('/'));
+				on:change={async () => {
+					// remove trailing slash
+					if (pathInput.endsWith('/')) {
+						pathInput = pathInput.slice(0, -1);
+					}
+					await currentPath.setPathFromName(pathInput.split('/'));
+					await goto('/explorer/' + $currentPath.pathID.join('/'));
+					await invalidate('entries:loader');
 				}}
 				autocorrect="false"
 				type="text"
