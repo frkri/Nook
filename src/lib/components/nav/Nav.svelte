@@ -64,6 +64,8 @@
 <ActionModal bind:open={dropdownOpen}>
 	<button
 		role="menuitem"
+		aria-label="Create a new folder"
+		id="folder"
 		class="flex w-full gap-1 rounded p-2 hover:bg-accents2"
 		on:click={() => {
 			newEntry.type = 'directory';
@@ -75,6 +77,8 @@
 	>
 	<button
 		role="menuitem"
+		aria-label="Create a new note"
+		id="note"
 		class="flex w-full gap-1 rounded p-2 hover:bg-accents2"
 		on:click={() => {
 			newEntry.type = 'file';
@@ -95,6 +99,7 @@
 		>
 			<button
 				class="button normal"
+				aria-label="Navigate to parent directory"
 				on:click={() => {
 					goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
 				}}
@@ -103,6 +108,7 @@
 			</button>
 			<input
 				class="flex-1 bg-background outline-none"
+				aria-label="Navigation path input field"
 				bind:value={pathInput}
 				on:change={async () => {
 					// remove trailing slash
@@ -145,7 +151,13 @@
 		</div>
 
 		<div>
-			<button role="menu" class="button normal" on:click={() => (dropdownOpen = !dropdownOpen)}>
+			<button
+				role="menu"
+				aria-label="Create New Entry"
+				aria-owns="folder note"
+				class="button normal"
+				on:click={() => (dropdownOpen = !dropdownOpen)}
+			>
 				<span class="hidden sm:inline-block">New</span>
 				<Plus />
 			</button>

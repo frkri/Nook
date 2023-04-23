@@ -18,6 +18,7 @@
 		class:grid={$viewType}
 		class:flex={!$viewType}
 		id="directories-list"
+		role="list"
 		aria-label="List of directories"
 		class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] flex-col gap-2 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(450px,1fr))]"
 	>
@@ -28,6 +29,7 @@
 	<div
 		class:grid={$viewType}
 		class:flex={!$viewType}
+		role="list"
 		aria-label="List of notes"
 		class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] flex-col gap-2 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(450px,1fr))]"
 	>
