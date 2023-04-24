@@ -20,10 +20,10 @@
 		id="directories-list"
 		role="list"
 		aria-label="List of directories"
-		class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] flex-col gap-2 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(450px,1fr))]"
+		class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 md:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
 	>
 		{#each dirEntries as item (item.id)}
-			<Item id={item.id} title={item.name} icon={item.icon} />
+			<Item entry={item} />
 		{/each}
 	</div>
 	<div
@@ -31,15 +31,10 @@
 		class:flex={!$viewType}
 		role="list"
 		aria-label="List of notes"
-		class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] flex-col gap-2 md:grid-cols-[repeat(auto-fill,minmax(350px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(450px,1fr))]"
+		class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 md:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
 	>
 		{#each fileEntries as item (item.id)}
-			<Item
-				id={item.id}
-				title={item.name}
-				icon={item.icon}
-				description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nisi vero eligendi dignissimos nostrum laboriosam neque."
-			/>
+			<Item entry={item} />
 		{/each}
 	</div>
 </div>

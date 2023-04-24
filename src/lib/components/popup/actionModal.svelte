@@ -28,7 +28,7 @@
 				}
 			}}
 		>
-			<div class="border-main flex h-56 flex-col justify-around bg-background p-3 md:w-1/2">
+			<div class="border-main flex h-60 w-full max-w-5xl flex-col justify-around bg-background p-3">
 				{#if title}
 					<h2 class="border-b text-xl font-bold">{title}</h2>
 				{/if}

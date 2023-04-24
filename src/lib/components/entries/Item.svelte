@@ -2,22 +2,17 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getDirEntryHandle, removeEntries } from '$lib/client/explorer';
-	import { viewType } from '$lib/store/viewType.js';
-	import { Edit, Trash } from 'lucide-svelte';
+	import { Trash } from 'lucide-svelte';
 	import ActionModal from '../popup/actionModal.svelte';
 
-	export let id: string;
-	export let title: string;
-	export let icon: string;
-	export let description: string | null = null;
+	export let entry: EntryData;
 
-	let editMode = false;
 	let modalConfirm = false;
 </script>
 
-<ActionModal bind:open={modalConfirm} title="Delete {description ? 'Note' : 'Folder'}">
+<ActionModal bind:open={modalConfirm} title="Delete {entry.type}">
 	<p class="line-clamp-3">
-		Are you sure you want to delete <span class="font-bold">{title}</span> and all of its contents?
+		Are you sure you want to delete <span class="font-bold">{entry.name}</span> and all of its contents?
 	</p>
 	<div class="flex justify-around">
 		<button
@@ -32,7 +27,7 @@
 			class="button alert"
 			on:click={async () => {
 				modalConfirm = false;
-				await removeEntries([id], await getDirEntryHandle(id));
+				await removeEntries([entry.id], await getDirEntryHandle(entry.id));
 				invalidate('entries:loader');
 			}}
 		>
@@ -45,37 +40,27 @@
 	class="group flex w-full cursor-pointer flex-col gap-2 rounded-lg border border-accents2 p-3 hover:border-accents5"
 >
 	<header class="flex items-center gap-3">
-		<a href={$page.url.pathname + '/' + id} class="flex flex-1 items-center gap-3">
+		<a href={$page.url.pathname + '/' + entry.id} class="flex flex-1 items-center gap-3">
 			<span class="inline-flex w-9 items-center justify-center rounded-lg bg-accents2 p-1 text-xl">
-				{icon}
+				{entry.icon}
 			</span>
 			<h3 class="line-clamp-1 w-5 flex-1 bg-background font-bold text-primary">
-				{title}
+				{entry.name}
 			</h3>
 		</a>
 		<button
 			class="hidden group-focus-within:inline-block group-hover:inline-block"
 			on:click={() => {
-				editMode = !editMode;
-			}}
-			tabindex={0}
-		>
-			<Edit class="stroke-accents2 transition hover:stroke-primary" />
-		</button>
-		<button
-			class="hidden group-focus-within:inline-block group-hover:inline-block"
-			on:click={() => {
 				modalConfirm = true;
 			}}
-			tabindex={0}
 		>
 			<Trash class="stroke-accents2 transition hover:stroke-primary" />
 		</button>
 	</header>
-	{#if description && $viewType}
+	{#if entry.description}
 		<div>
-			<p class="line-clamp-3 text-sm text-secondary sm:line-clamp-4">
-				{description}
+			<p class="line-clamp-2 text-sm text-secondary sm:line-clamp-4">
+				{entry.description}
 			</p>
 		</div>
 	{/if}

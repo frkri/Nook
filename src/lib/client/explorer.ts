@@ -124,7 +124,7 @@ export async function resolveEntriesByName(path: string[]): Promise<EntryData[]>
 
 /**
  * Creates multiple new Entries in the current directory
- * @param newEntry
+ * @param newEntries
  * @param currentDirHandle Stays Root if not provided
  * @returns The created entry
  */
@@ -145,6 +145,7 @@ export async function createEntries(
 			id: crypto.randomUUID(),
 			created: Date.now(),
 			modified: Date.now(),
+			description: '',
 			...newEntry
 		};
 
@@ -155,9 +156,13 @@ export async function createEntries(
 		// Add entry to cache
 		entryCache.set(entry.id, entry);
 
-		// Add entry to current directory & add to cache
-		const handle = await currentDirHandle.getDirectoryHandle(entry.id, { create: true });
-		handleCache.set(entry.id, handle);
+		// Add entry to current directory (& add to cache)
+		if (entry.type === 'directory') {
+			const handle = await currentDirHandle.getDirectoryHandle(entry.id, { create: true });
+			handleCache.set(entry.id, handle);
+		} else if (entry.type === 'file') {
+			await currentDirHandle.getFileHandle(entry.id, { create: true });
+		}
 	}
 
 	return newEntries;

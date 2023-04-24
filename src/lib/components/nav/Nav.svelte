@@ -23,7 +23,7 @@
 
 <!-- Entry edit modal -->
 <ActionModal bind:open={inputOpen} title="Create new {newEntry.type}">
-	<div class="m-3 flex justify-around gap-2">
+	<div class="sm:m-3 flex justify-around gap-2">
 		<input
 			bind:value={newEntry.icon}
 			required={true}
@@ -94,18 +94,17 @@
 	class="fixed top-0 z-10 flex h-[60px] w-full items-center border-b border-b-accents2 bg-background pl-5 pr-5"
 >
 	<div class="flex h-[40px] w-full gap-2">
+		<!-- Navigation path and back button -->
 		<span
 			class="line-clamp-1 flex flex-1 flex-row items-center gap-4 text-ellipsis text-2xl font-bold"
 		>
-			<button
+			<a
+				href={'/explorer/' + $currentPath.pathID.slice(0, -1).join('/')}
 				class="button normal"
 				aria-label="Navigate to parent directory"
-				on:click={() => {
-					goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
-				}}
 			>
 				<ChevronLeft />
-			</button>
+			</a>
 			<input
 				class="flex-1 bg-background outline-none"
 				aria-label="Navigation path input field"
@@ -125,9 +124,9 @@
 			/>
 		</span>
 
-		<div class="hidden gap-1 rounded-lg border border-accents2 p-1 sm:flex" role="radiogroup">
+		<div class="gap-1 rounded-lg border border-accents2 p-1 flex" role="radiogroup">
 			<button
-				class="group flex items-center rounded p-1 aria-checked:bg-accents2"
+				class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
 				aria-checked={!$viewType}
 				aria-label="Switch to list view"
 				role="radio"
@@ -138,7 +137,7 @@
 				/>
 			</button>
 			<button
-				class="group flex items-center rounded p-1 aria-checked:bg-accents2"
+				class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
 				aria-checked={$viewType}
 				aria-label="Switch to grid view"
 				role="radio"
