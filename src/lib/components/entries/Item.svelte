@@ -8,6 +8,8 @@
 	export let entry: EntryData;
 
 	let modalConfirm = false;
+	$: entryPath =
+		entry.type === 'directory' ? $page.url.pathname + '/' + entry.id : '/editor/' + entry.id;
 </script>
 
 <ActionModal bind:open={modalConfirm} title="Delete {entry.type}">
@@ -28,7 +30,7 @@
 			on:click={async () => {
 				modalConfirm = false;
 				await removeEntries([entry.id], await getDirEntryHandle(entry.id));
-				invalidate('entries:loader');
+				invalidate('entries:explorer-loader');
 			}}
 		>
 			Confirm
@@ -40,7 +42,7 @@
 	class="group flex w-full cursor-pointer flex-col gap-2 rounded-lg border border-accents2 p-3 hover:border-accents5"
 >
 	<header class="flex items-center gap-3">
-		<a href={$page.url.pathname + '/' + entry.id} class="flex flex-1 items-center gap-3">
+		<a href={entryPath} class="flex flex-1 items-center gap-3">
 			<span class="inline-flex w-9 items-center justify-center rounded-lg bg-accents2 p-1 text-xl">
 				{entry.icon}
 			</span>

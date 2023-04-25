@@ -52,7 +52,7 @@
 			on:click={async () => {
 				inputOpen = false;
 				await createEntries([newEntry], await getDirEntryHandle($currentPath.currentDirID));
-				await invalidate('entries:loader');
+				await invalidate('entries:explorer-loader');
 			}}
 		>
 			Create
@@ -116,7 +116,7 @@
 					}
 					await currentPath.setPathFromName(pathInput.split('/'));
 					await goto('/explorer/' + $currentPath.pathID.join('/'));
-					await invalidate('entries:loader');
+					await invalidate('entries:explorer-loader');
 				}}
 				autocorrect="false"
 				type="text"
