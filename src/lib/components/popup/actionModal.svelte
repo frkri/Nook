@@ -1,17 +1,39 @@
 <script lang="ts">
-	export let open = false;
+	import Portal from 'svelte-portal';
 
-	// optional title
+	export let open = false;
 	export let title = '';
+
+	$: if (open) {
+		document.addEventListener('keydown', handleKeyDown, true);
+	} else {
+		document.removeEventListener('keydown', handleKeyDown, true);
+	}
+
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			open = false;
+		}
+	}
 </script>
 
 {#if open}
-	<div class="fixed bottom-0 left-0 flex w-screen justify-center p-5">
-		<div class="border-main flex h-56 flex-col justify-around p-3 md:w-1/2">
-			{#if title}
-				<h2 class="border-b text-xl font-bold">{title}</h2>
-			{/if}
-			<slot />
+	<Portal target="#portal-target">
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div
+			class="fixed bottom-0 left-0 z-10 flex h-screen w-screen items-end justify-center bg-background bg-opacity-40 p-5"
+			on:click={(e) => {
+				if (e.target === e.currentTarget) {
+					open = false;
+				}
+			}}
+		>
+			<div class="border-main flex h-60 w-full max-w-5xl flex-col justify-around bg-background p-3">
+				{#if title}
+					<h2 class="border-b text-xl font-bold">{title}</h2>
+				{/if}
+				<slot />
+			</div>
 		</div>
-	</div>
+	</Portal>
 {/if}

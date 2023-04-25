@@ -1,43 +1,23 @@
 // Using @types/wicg-file-system-access for FileSystem API types support
-
 import { db } from '$lib/client/db';
-import { getMapEntryByName, walkDirectory } from './utils';
+import { getMapEntryByName, walkDirectory } from '../client/utils';
 
-// Simple Key-Value cache for entries
-// ID - Entry Object
-const entryCache = new Map<string, Entry>();
+/**
+ * Key-Value cache for entries
+ */
+const entryCache = new Map<string, EntryData>();
 
-export interface Entry {
-	name: string;
-	icon: string;
-	kind: 'directory' | 'file';
-	id?: string;
-	created?: number;
-	modified?: number;
-	parent?: string;
-}
-
-enum EntryType {
-	Directory = 'directory',
-	File = 'file'
-}
-
-export interface EntryData {
-	id: string; // UUID
-	icon: string; // Image URL
-	name: string;
-	created: number; // Timestamp
-	modified: number; // Timestamp
-	type: EntryType;
-	handle: FileSystemDirectoryHandle | FileSystemFileHandle;
-}
+/**
+ * Key-Value cache for handles
+ */
+const handleCache = new Map<string, FileSystemDirectoryHandle>();
 
 /**
  * Get multiple entries from the database using IDs
  * @param ids
- * @returns Array with resolved Entries, or null if not found
+ * @returns Array with Entries, or null if not found
  */
-export async function getEntriesByID(ids: string[]): Promise<(Entry | null)[]> {
+export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[]> {
 	// Open new transaction
 	const tx = db.transaction('entries', 'readonly');
 
@@ -45,194 +25,207 @@ export async function getEntriesByID(ids: string[]): Promise<(Entry | null)[]> {
 	// If it's not in either, return null
 	const entries = await Promise.all(
 		ids.map(async (id) => {
-			// Check cache first
-			const cachedEntry = entryCache.get(id);
+			// Check cache for entry
+			let entry = entryCache.get(id);
 
-			if (cachedEntry) {
+			if (entry) {
 				console.debug('Cache hit for', id);
-				return cachedEntry;
+				return entry;
 			} else {
 				// If not in cache, fetch from database & add to cache
 				console.debug('Cache miss for', id);
-				const entry = await tx.store.get(id);
+
+				entry = await tx.store.get(id);
 				if (entry) {
 					entryCache.set(id, entry);
 					return entry;
 				}
-			}
 
-			return null;
-		})
-	);
-
-	// Filter out any entries that weren't in the database
-	//return entries.filter((entry) => entry !== undefined) as Entry[];
-	tx.commit();
-	return entries;
-}
-
-export async function getEntriesByName(names: string[]): Promise<(Entry | null)[]> {
-	// Open new transaction
-	const tx = db.transaction('entries', 'readonly');
-	const index = tx.store.index('by-name');
-
-	// For each name, check the cache first, then the database
-	// If it's not in either, return null
-	const entries = await Promise.all(
-		names.map(async (name) => {
-			// Check cache first
-			const cachedEntry = await getMapEntryByName(entryCache, name);
-
-			if (cachedEntry) {
-				console.debug('Cache hit for', name);
-
-				return cachedEntry;
-			} else {
-				// If not in cache, fetch from database & add to cache
-				console.debug('Cache miss for', name);
-
-				const entry = await index.get(name);
-				if (entry && entry.id) {
-					entryCache.set(entry.id, entry);
-					return entry;
-				}
-
+				// If not in database, return null
 				return null;
 			}
 		})
 	);
 
+	tx.commit();
 	return entries;
 }
 
-export async function getEntryByID(id: string): Promise<Entry | null> {
-	// Check cache first
-	const cachedEntry = entryCache.get(id);
-	if (cachedEntry) {
-		console.debug('Cache hit for', id);
-		return cachedEntry;
-	}
+/**
+ * Get multiple entries from the database using names
+ * @param names
+ * @returns Array with resolved Entries, or null if not found
+ */
+export async function getEntriesByName(names: string[]): Promise<(EntryData | null)[]> {
+	// Open new transaction
+	const tx = db.transaction('entries', 'readonly');
+	const index = tx.store.index('name-index');
 
-	// If not in cache, fetch from database and add to cache
-	const entry = await db.get('entries', id);
-	if (entry) {
-		console.debug('Cache miss for', id);
-		entryCache.set(id, entry);
-		return entry;
-	}
+	// For each name, check the cache first, then the database
+	// If it's not in either, return null
+	const entries = await Promise.all(
+		names.map(async (name) => {
+			// Check cache for entry
+			let entry = await getMapEntryByName(entryCache, name);
 
-	return null;
+			if (entry) {
+				console.debug('Cache hit for', name);
+				return entry;
+			} else {
+				// If not in cache, fetch from database & add to cache
+				console.debug('Cache miss for', name);
+
+				entry = await index.get(name);
+				if (entry) {
+					entryCache.set(name, entry);
+					return entry;
+				}
+
+				// If not in database, return null
+				return null;
+			}
+		})
+	);
+
+	tx.commit();
+	return entries;
 }
 
-export async function getEntryByName(name: string): Promise<Entry | null> {
-	// Check cache first
-	const cachedEntry = Array.from(entryCache.values()).find((entry) => entry.name === name);
-	if (cachedEntry) {
-		console.debug('Cache hit for', name);
-		return cachedEntry;
-	}
-
-	// If not in cache, fetch from database and add to cache
-	const entry = await db.getFromIndex('entries', 'by-name', name);
-	if (entry?.id !== undefined) {
-		console.debug('Cache miss for', name);
-		entryCache.set(entry.id, entry);
-
-		return entry;
-	}
-
-	return null;
-}
-
-export async function getEntryHandle(id?: string): Promise<FileSystemDirectoryHandle | undefined> {
-	const dirHandle = await navigator.storage.getDirectory();
-
-	// If no ID or "root" is provided, return root directory handle
-	if (!id || id === '' || id === 'root') return dirHandle;
-
-	const reqDirHandle = await walkDirectory(dirHandle, id);
-
-	return reqDirHandle;
-}
-
-// Returns an array of resolved names from IDs
-export async function resolvePathFromIDs(IDs: string[]): Promise<string[]> {
-	const resolvedPath: string[] = [];
-
-	for await (const id of IDs) {
-		const entry = await getEntryByID(id);
-		if (entry === null) continue;
-
-		resolvedPath.push(entry.name);
-	}
-
+/**
+ * Helper function to resolve entries using IDs
+ * Meant to be used with a path array and to verify whether the path exists
+ * @param Array of IDs
+ * @returns Array of entries data until and excluding the first null entry
+ */
+export async function resolveEntriesByID(path: string[]): Promise<EntryData[]> {
+	const entries = await getEntriesByID(path);
+	const resolvedPath = entries.splice(
+		0,
+		entries.indexOf(null) === -1 ? entries.length : entries.indexOf(null)
+	) as EntryData[];
 	return resolvedPath;
 }
 
-export async function resolveIDsFromPath(Path: string[]): Promise<string[]> {
-	const resolvedIDs: string[] = [];
-
-	for await (const name of Path) {
-		const entry = await getEntryByName(name);
-		if (entry?.id === undefined) continue;
-
-		resolvedIDs.push(entry.id);
-	}
-
-	return resolvedIDs;
+/**
+ * Helper function to resolve entries using names
+ * Meant to be used with a path array and to verify whether the path exists
+ * @param Array of IDs
+ * @returns Array of entries data until and excluding the first null entry
+ */
+export async function resolveEntriesByName(path: string[]): Promise<EntryData[]> {
+	const entries = await getEntriesByName(path);
+	// Matches up to the first null entry
+	const resolvedPath = entries.splice(
+		0,
+		entries.indexOf(null) === -1 ? entries.length : entries.indexOf(null)
+	) as EntryData[];
+	return resolvedPath;
 }
 
-export async function createEntry(
-	newEntry: Entry = {
-		name: 'New Entry',
-		icon: '📂',
-		kind: 'directory'
-	},
+/**
+ * Creates multiple new Entries in the current directory
+ * @param newEntries
+ * @param currentDirHandle Stays Root if not provided
+ * @returns The created entry
+ */
+export async function createEntries(
+	newEntries: EntryDataBasic[],
 	currentDirHandle?: FileSystemDirectoryHandle
-): Promise<FileSystemDirectoryHandle | FileSystemFileHandle> {
-	// Error out if the entry already exists
-	// Push message to svelte component to add entry to UI.
-
+) {
+	// Get root directory handle if not provided
 	if (!currentDirHandle) currentDirHandle = await navigator.storage.getDirectory();
 
-	// Set default values
-	newEntry.created = Date.now();
-	newEntry.modified = Date.now();
-	newEntry.parent = currentDirHandle.name;
-	newEntry.id = crypto.randomUUID();
+	console.log('Creating entries', newEntries, 'in', currentDirHandle);
 
-	let newEntryHandle: FileSystemDirectoryHandle | FileSystemFileHandle;
+	// Open new transaction
+	const tx = db.transaction('entries', 'readwrite');
 
-	// Add entry to database only if it doesn't exist
-	await db.add('entries', newEntry);
+	for await (const newEntry of newEntries) {
+		const entry: EntryData = {
+			id: crypto.randomUUID(),
+			created: Date.now(),
+			modified: Date.now(),
+			description: '',
+			...newEntry
+		};
 
-	if (newEntry.kind === 'directory') {
-		newEntryHandle = await currentDirHandle.getDirectoryHandle(newEntry.id, { create: true });
-	} else {
-		newEntryHandle = await currentDirHandle.getFileHandle(newEntry.id, { create: true });
+		// Add entry to database, throw error if it already exists (shouldn't happen with UUIDs)
+		if ((await tx.store.add(entry)) === undefined)
+			throw new Error(`Entry "${entry.id}" already exists`);
+
+		// Add entry to cache
+		entryCache.set(entry.id, entry);
+
+		// Add entry to current directory (& add to cache)
+		if (entry.type === 'directory') {
+			const handle = await currentDirHandle.getDirectoryHandle(entry.id, { create: true });
+			handleCache.set(entry.id, handle);
+		} else if (entry.type === 'file') {
+			await currentDirHandle.getFileHandle(entry.id, { create: true });
+		}
 	}
 
-	console.log('Created new entry: ' + newEntry.name + ' with ID: ' + newEntry.id);
-
-	return newEntryHandle;
+	return newEntries;
 }
 
-// Removes Entry using its ID, if currentDirHandle is provided, it won't search for the entry
-export async function removeEntryByID(id: string, currentDirHandle?: FileSystemDirectoryHandle) {
-	console.log('Removing entry with ID: ' + id);
+export async function getDirEntryHandle(
+	id: string,
+	currentDirHandle?: FileSystemDirectoryHandle
+): Promise<FileSystemDirectoryHandle | undefined> {
+	// Get root directory handle if not provided
+	if (currentDirHandle === undefined) currentDirHandle = await navigator.storage.getDirectory();
 
-	// Remove entry from cache
-	entryCache.delete(id);
+	// Chrome and Firefox have different names for the root directory
+	if (id === 'root' || id === '') return currentDirHandle;
 
-	// Remove entry from database
-	db.delete('entries', id);
+	// Check cache for handle
+	let handle = handleCache.get(id);
 
-	// Remove entry from file system
-	if (currentDirHandle) {
-		await currentDirHandle.removeEntry(id, { recursive: true });
+	if (handle) {
+		console.debug('Cache hit for', id);
+		return handle;
 	} else {
-		await getEntryHandle(id).then((entryHandle) => {
-			entryHandle?.removeEntry(id, { recursive: true });
-		});
+		// If not in cache, fetch from directory & add to cache
+		console.debug('Cache miss for', id);
+
+		handle = await walkDirectory(currentDirHandle, id);
+		if (handle) {
+			handleCache.set(id, handle);
+			return handle;
+		}
+	}
+
+	return undefined;
+}
+
+/**
+ * Removes multiple entries by IDs from the current directory
+ * @param ids Array of IDs
+ * @param currentDirHandle Root if not provided
+ */
+export async function removeEntries(
+	ids: string[],
+	currentDirHandle?: FileSystemDirectoryHandle
+): Promise<void> {
+	// Get root directory handle if not provided
+	if (!currentDirHandle)
+		currentDirHandle = (await navigator.storage.getDirectory()) as FileSystemDirectoryHandle;
+
+	// Open new transaction
+	const tx = db.transaction('entries', 'readwrite');
+
+	for await (const id of ids) {
+		// Remove entry from cache
+		entryCache.delete(id);
+
+		// Remove entry from database
+		await tx.store.delete(id);
+
+		// Remove entry from current directory & remove from cache
+		const handle = await walkDirectory(currentDirHandle, id);
+		if (handle) {
+			await handle.removeEntry(id, { recursive: true });
+			handleCache.delete(id);
+		}
 	}
 }

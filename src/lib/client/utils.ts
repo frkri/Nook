@@ -1,7 +1,5 @@
 // Using @types/wicg-file-system-access for FileSystem API types support
 
-import type { Entry } from './explorer';
-
 /**
  * Walk the directory tree to get the directory handle of a directory or file using its name
  * @param startDirHandle
@@ -37,12 +35,26 @@ export async function walkDirectory(
  * @returns The key of the entry in the map, or undefined if not found
  */
 export async function getMapEntryByName(
-	map: Map<string, Entry>,
+	map: Map<string, EntryData>,
 	value: string
-): Promise<Entry | undefined> {
+): Promise<EntryData | undefined> {
 	for (const [, v] of map.entries()) {
 		if (v.name === value) return v;
 	}
 
 	return undefined;
+}
+
+/**
+ * Convert an async iterable to an array
+ * @param iter Async iterable
+ * @returns Array of items found in the iterable
+ */
+export async function iterToArray<T>(iter: AsyncIterable<T>): Promise<T[]> {
+	const arr: T[] = [];
+
+	for await (const item of iter) {
+		arr.push(item);
+	}
+	return arr;
 }

@@ -1,53 +1,48 @@
-import { resolveIDsFromPath, resolvePathFromIDs } from '$lib/client/explorer';
+import { resolveEntriesByID, resolveEntriesByName } from '$lib/client/explorer';
 import { writable } from 'svelte/store';
 
 interface currentPath {
-	resolvedPath: string[]; // Path with names
-	path: string[]; // path with IDs
-
-	currentDirID: string; // ID of current directory
-	currentDirName: string; // Name of current directory
+	pathData: EntryData[]; // Path with EntryData objects
+	pathID: string[]; // Path with IDs
+	currentDirID: string; // Current directory ID
+	currentDirName: string; // Current directory name
 }
 
 function createPathStore() {
 	const { subscribe, set } = writable<currentPath>({
-		resolvedPath: [],
-		path: [],
+		pathData: [],
+		pathID: [],
 		currentDirID: '',
 		currentDirName: ''
 	});
 
 	return {
 		subscribe,
-		setResolvedPath: async (resolvedPath: string) => {
-			const newCurrentPathID = await resolveIDsFromPath(resolvedPath.split('/'));
-			const newCurrentPath = await resolvePathFromIDs(newCurrentPathID); // Mozda ima bolji nacin da se ovo uradi
+		setPathFromID: async (path: string[]) => {
+			const entries = await resolveEntriesByID(path);
+			console.log('got entries', entries);
+			// New array with only the ID of the entries
+			const resolvedPathIDs = entries.map((entry) => entry.id);
 
 			set({
-				resolvedPath: newCurrentPath,
-				path: newCurrentPathID,
-				currentDirID: newCurrentPathID[newCurrentPathID.length - 1] || 'root',
-				currentDirName: newCurrentPath[newCurrentPath.length - 1] || 'root'
+				pathData: entries,
+				pathID: resolvedPathIDs,
+				currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
+				currentDirName: entries[entries.length - 1]?.name || ''
 			});
-
-			return newCurrentPathID;
 		},
-		/**
-		 * Set the current path using IDs
-		 * @param path
-		 */
-		setPath: async (path: string) => {
-			const newCurrentPathID = path.split('/');
-			const newCurrentPath = await resolvePathFromIDs(newCurrentPathID);
+		setPathFromName: async (path: string[]) => {
+			const entries = await resolveEntriesByName(path);
+			console.log('got entries', entries);
+			// New array with only the ID of the entries
+			const resolvedPathIDs = entries.map((entry) => entry.id);
 
 			set({
-				resolvedPath: newCurrentPath,
-				path: newCurrentPathID,
-				currentDirID: newCurrentPathID[newCurrentPathID.length - 1] || 'root',
-				currentDirName: newCurrentPath[newCurrentPathID.length - 1] || 'root'
+				pathData: entries,
+				pathID: resolvedPathIDs,
+				currentDirID: resolvedPathIDs[resolvedPathIDs.length - 1] || '',
+				currentDirName: entries[entries.length - 1]?.name || ''
 			});
-
-			return newCurrentPath;
 		}
 	};
 }

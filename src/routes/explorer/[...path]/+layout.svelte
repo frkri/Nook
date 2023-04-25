@@ -4,7 +4,7 @@
 	import { currentPath } from '$lib/store/currentPath';
 
 	// Sets the current path from page params
-	$: currentPath.setPath($page.params.path || '');
+	$: currentPath.setPathFromID($page.params.path.split('/') || ['']);
 </script>
 
 <svelte:head>
