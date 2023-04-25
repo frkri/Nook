@@ -2,7 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
 	import { currentPath } from '$lib/store/currentPath';
-	import { viewType } from '$lib/store/viewType';
+	import { viewTypeList } from '$lib/store/viewType';
 	import { ChevronLeft, File, Folder, LayoutGrid, List, Plus } from 'lucide-svelte';
 	import ActionModal from '../popup/actionModal.svelte';
 
@@ -127,10 +127,10 @@
 		<div class="gap-1 rounded-lg border border-accents2 p-1 flex" role="radiogroup">
 			<button
 				class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
-				aria-checked={!$viewType}
+				aria-checked={!$viewTypeList}
 				aria-label="Switch to list view"
 				role="radio"
-				on:click={() => viewType.set(false)}
+				on:click={() => viewTypeList.set(false)}
 			>
 				<List
 					class="w-6 stroke-accents2 transition hover:stroke-primary group-aria-checked:stroke-primary"
@@ -138,10 +138,10 @@
 			</button>
 			<button
 				class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
-				aria-checked={$viewType}
+				aria-checked={$viewTypeList}
 				aria-label="Switch to grid view"
 				role="radio"
-				on:click={() => viewType.set(true)}
+				on:click={() => viewTypeList.set(true)}
 			>
 				<LayoutGrid
 					class="w-6 stroke-accents2 transition hover:stroke-primary group-aria-checked:stroke-primary"

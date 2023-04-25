@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Item from '$lib/components/entries/Item.svelte';
-	import { viewType } from '$lib/store/viewType';
+	import { viewTypeList } from '$lib/store/viewType';
 
 	export let data;
 
@@ -15,8 +15,8 @@
 	</div>
 
 	<div
-		class:grid={$viewType}
-		class:flex={!$viewType}
+		class:grid={$viewTypeList}
+		class:flex={!$viewTypeList}
 		id="directories-list"
 		role="list"
 		aria-label="List of directories"
@@ -27,8 +27,8 @@
 		{/each}
 	</div>
 	<div
-		class:grid={$viewType}
-		class:flex={!$viewType}
+		class:grid={$viewTypeList}
+		class:flex={!$viewTypeList}
 		role="list"
 		aria-label="List of notes"
 		class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 md:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
