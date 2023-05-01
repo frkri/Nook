@@ -20,7 +20,6 @@ function createPathStore() {
 		subscribe,
 		setPathFromID: async (path: string[]) => {
 			const entries = await resolveEntriesByID(path);
-			console.log('got entries', entries);
 			// New array with only the ID of the entries
 			const resolvedPathIDs = entries.map((entry) => entry.id);
 
@@ -33,7 +32,6 @@ function createPathStore() {
 		},
 		setPathFromName: async (path: string[]) => {
 			const entries = await resolveEntriesByName(path);
-			console.log('got entries', entries);
 			// New array with only the ID of the entries
 			const resolvedPathIDs = entries.map((entry) => entry.id);
 

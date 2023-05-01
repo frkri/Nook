@@ -1,5 +1,4 @@
-import { getDirEntryHandle, getEntriesByID, resolveEntriesByID } from '$lib/client/explorer';
-import { iterToArray } from '$lib/client/utils';
+import { getFileEntryHandle, resolveEntriesByID } from '$lib/client/explorer';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
@@ -7,17 +6,16 @@ export const load = (async ({ params, depends }) => {
 	// Allows force refresh on create or remove events
 	depends('entries:editor-loader');
 
-	const currDirID = params.path.split('/').pop() || 'root';
+	const fileID = params.path.split('/').pop() || 'root';
 
-	const entry = await resolveEntriesByID([currDirID]);
-	const currDirHandle = await getDirEntryHandle(currDirID);
+	// Get Entry of File
+	const entry = await resolveEntriesByID([fileID]);
+	const entryHandle = await getFileEntryHandle(fileID);
 
-	// Show 404 if entry not found
-	if (!currDirHandle) throw error(404, 'Entry not found');
-	if (currDirHandle.kind !== 'directory') throw error(404, 'Entry is a directory, not a file');
+	if (!entry || !entryHandle) throw error(404, 'Entry not found');
 
-	// Get entries of current Directory
-	const reslovedEntries = await getEntriesByID(await iterToArray(currDirHandle.keys()));
-
-	return {};
+	return {
+		entry: entry[0],
+		entryHandle: entryHandle
+	};
 }) satisfies PageLoad;

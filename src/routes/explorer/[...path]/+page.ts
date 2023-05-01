@@ -14,8 +14,19 @@ export const load = (async ({ params, depends }) => {
 	if (!currDirHandle) throw error(404, 'Entry not found');
 	if (currDirHandle.kind !== 'directory') throw error(404, 'Entry is not a directory');
 
+	// Check if current directory is root
+	const dirKeys = await iterToArray(currDirHandle.keys());
+
+	// Prematurely return if directory is empty
+	if (dirKeys.length === 0) {
+		return {
+			dirEntries: [],
+			fileEntries: []
+		};
+	}
+
 	// Get entries of current Directory
-	const reslovedEntries = await getEntriesByID(await iterToArray(currDirHandle.keys()));
+	const reslovedEntries = await getEntriesByID(dirKeys);
 
 	const dirEntries = reslovedEntries.filter(
 		(entry) => entry?.type === 'directory' && entry !== null

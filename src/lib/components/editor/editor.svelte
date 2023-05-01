@@ -1,13 +1,23 @@
 <script lang="ts">
 	import { viewTypeEditor } from '$lib/store/viewType';
-	import { Edit, FileText, Trash } from 'lucide-svelte';
+	import { Edit, FileText, Save, Trash } from 'lucide-svelte';
+	import snarkdown from 'snarkdown';
 
-	let modalConfirm = false;
+	export let entry: EntryData;
+	export let entryHandle: FileSystemFileHandle;
+
+	let entryContent = '';
+
+	entryHandle.getFile().then((file) => {
+		file.text().then((text) => {
+			entryContent = text;
+		});
+	});
 </script>
 
 <main class="flex-1 p-4 flex flex-col gap-5">
 	<h1 class="text-lg line-clamp-1 font-bold">
-		{'Lorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem IpsumLorem Ipsum'}
+		{entry.name}
 	</h1>
 	<div class="flex justify-between">
 		<div class="gap-1 rounded-lg border border-accents2 p-1 flex" role="radiogroup">
@@ -45,9 +55,34 @@
 			</button>
 		</div>
 
+		<button
+			class="group w-28 flex items-center justify-between rounded p-1 gap-2 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
+			aria-label="Save current file"
+			on:click={() => viewTypeEditor.set(true)}
+		>
+			<Save
+				class="w-6 stroke-accents2 transition group-hover:stroke-primary group-aria-checked:stroke-primary"
+			/>
+			<span
+				class="text-secondary transition group-hover:text-primary group-aria-checked:text-primary"
+			>
+				Save
+			</span>
+		</button>
+
 		<button class="button alert trans">
 			<Trash />
 		</button>
 	</div>
-	<textarea name="" class="bg-background p-2 h-1/2 border rounded border-accents3" />
+	{#if $viewTypeEditor}
+		<div class="bg-background p-2 border rounded border-accents3">
+			{@html snarkdown(entryContent)}
+		</div>
+	{:else}
+		<textarea
+			bind:value={entryContent}
+			class="bg-background p-2 border rounded border-accents3 resize-none"
+			wrap="off"
+		/>
+	{/if}
 </main>

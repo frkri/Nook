@@ -198,6 +198,20 @@ export async function getDirEntryHandle(
 	return undefined;
 }
 
+export async function getFileEntryHandle(
+	id: string,
+	currentDirHandle?: FileSystemDirectoryHandle
+): Promise<FileSystemFileHandle | undefined> {
+	// Get root directory handle if not provided
+	if (currentDirHandle === undefined) currentDirHandle = await navigator.storage.getDirectory();
+
+	// Find parent directory of file
+	const dirHandle = await walkDirectory(currentDirHandle, id);
+	const fileHandle = await dirHandle?.getFileHandle(id);
+
+	return fileHandle;
+}
+
 /**
  * Removes multiple entries by IDs from the current directory
  * @param ids Array of IDs
