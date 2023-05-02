@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Item from '$lib/components/entries/Item.svelte';
-	import { viewTypeList } from '$lib/store/viewType';
+	import { viewTypeList } from '$lib/store/userPreferences.js';
 
 	export let data;
 

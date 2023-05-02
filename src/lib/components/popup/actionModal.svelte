@@ -30,7 +30,7 @@
 		>
 			<div class="border-main flex h-60 w-full max-w-5xl flex-col justify-around bg-background p-3">
 				{#if title}
-					<h2 class="border-b text-xl font-bold">{title}</h2>
+					<h2 class="border-b text-xl font-bold pb-2">{title}</h2>
 				{/if}
 				<slot />
 			</div>

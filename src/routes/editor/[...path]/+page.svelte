@@ -4,6 +4,6 @@
 	export let data;
 </script>
 
-<div class="">
+<div>
 	<Editor {...data} />
 </div>

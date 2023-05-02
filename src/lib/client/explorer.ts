@@ -212,6 +212,23 @@ export async function getFileEntryHandle(
 	return fileHandle;
 }
 
+export async function readEntryContents(fileHandle: FileSystemFileHandle): Promise<string> {
+	const file = await fileHandle.getFile();
+
+	return await file.text();
+}
+
+export async function writeEntryContents(
+	fileHandle: FileSystemFileHandle,
+	content: string
+): Promise<void> {
+	const writable = await fileHandle.createWritable();
+	await writable.write(content);
+	await writable.close();
+
+	console.debug('Saved file: ' + fileHandle.name);
+}
+
 /**
  * Removes multiple entries by IDs from the current directory
  * @param ids Array of IDs

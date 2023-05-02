@@ -2,7 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
 	import { currentPath } from '$lib/store/currentPath';
-	import { viewTypeList } from '$lib/store/viewType';
+	import { viewTypeList } from '$lib/store/userPreferences';
 	import { ChevronLeft, File, Folder, LayoutGrid, List, Plus } from 'lucide-svelte';
 	import ActionModal from '../popup/actionModal.svelte';
 
@@ -110,7 +110,7 @@
 				aria-label="Navigation path input field"
 				bind:value={pathInput}
 				on:change={async () => {
-					// remove trailing slash
+					// Remove trailing slash
 					if (pathInput.endsWith('/')) {
 						pathInput = pathInput.slice(0, -1);
 					}

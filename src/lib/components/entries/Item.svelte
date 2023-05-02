@@ -1,18 +1,24 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { getDirEntryHandle, removeEntries } from '$lib/client/explorer';
+	import ActionModal from '$lib/components/popup/actionModal.svelte';
+	import { currentPath } from '$lib/store/currentPath';
 	import { Trash } from 'lucide-svelte';
-	import ActionModal from '../popup/actionModal.svelte';
 
 	export let entry: EntryData;
 
 	let modalConfirm = false;
+
+	// Builds path to next entry
+	$: prefix = entry.type === 'directory' ? '/explorer/' : '/editor/';
 	$: entryPath =
-		entry.type === 'directory' ? $page.url.pathname + '/' + entry.id : '/editor/' + entry.id;
+		prefix +
+		$currentPath.pathID.join('/') +
+		($currentPath.pathID.length === 0 ? '' : '/') +
+		entry.id;
 </script>
 
-<ActionModal bind:open={modalConfirm} title="Delete {entry.type}">
+<ActionModal bind:open={modalConfirm} title="Delete {entry.type}?">
 	<p class="line-clamp-3">
 		Are you sure you want to delete <span class="font-bold">{entry.name}</span> and all of its contents?
 	</p>
