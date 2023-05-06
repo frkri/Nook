@@ -23,7 +23,7 @@
 
 <!-- Entry edit modal -->
 <ActionModal bind:open={inputOpen} title="Create new {newEntry.type}">
-	<div class="sm:m-3 flex justify-around gap-2">
+	<div class="flex justify-around gap-2 sm:m-3">
 		<input
 			bind:value={newEntry.icon}
 			required={true}
@@ -35,12 +35,12 @@
 			required={true}
 			maxlength="25"
 			placeholder={newEntry.type === 'file' ? 'New Note' : 'New Folder'}
-			class="border-main inline-inline-block min-w-0 flex-1 bg-background p-2 font-bold text-primary placeholder:text-accents4"
+			class="border-main min-w-0 flex-1 bg-background p-2 font-bold text-primary placeholder:text-accents4"
 		/>
 	</div>
 	<div class="flex justify-around">
 		<button
-			class="button normal"
+			class="button secondary"
 			on:click={() => {
 				inputOpen = false;
 			}}
@@ -51,7 +51,7 @@
 			class="button normal"
 			on:click={async () => {
 				inputOpen = false;
-				await createEntries([newEntry], await getDirEntryHandle($currentPath.currentDirID));
+				await createEntries([newEntry], await getDirEntryHandle($currentPath.currentEntryID));
 				await invalidate('entries:explorer-loader');
 			}}
 		>
@@ -91,9 +91,9 @@
 </ActionModal>
 
 <nav
-	class="fixed top-0 z-10 flex h-[60px] w-full items-center border-b border-b-accents2 bg-background pl-5 pr-5"
+	class="sticky z-10 flex h-[60px] w-full items-center border-b border-b-accents2 bg-background pl-5 pr-5"
 >
-	<div class="flex h-[40px] w-full gap-2">
+	<div class="group flex h-[40px] w-full gap-2">
 		<!-- Navigation path and back button -->
 		<span
 			class="line-clamp-1 flex flex-1 flex-row items-center gap-4 text-ellipsis text-2xl font-bold"
@@ -124,7 +124,7 @@
 			/>
 		</span>
 
-		<div class="gap-1 rounded-lg border border-accents2 p-1 flex" role="radiogroup">
+		<div class="flex gap-1 rounded-lg border border-accents2 p-1" role="radiogroup">
 			<button
 				class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
 				aria-checked={!$viewTypeList}
@@ -133,7 +133,7 @@
 				on:click={() => viewTypeList.set(false)}
 			>
 				<List
-					class="w-6 stroke-accents2 transition hover:stroke-primary group-aria-checked:stroke-primary"
+					class="w-6 stroke-accents2 transition hover:stroke-primary group-focus:stroke-primary group-aria-checked:stroke-primary"
 				/>
 			</button>
 			<button
@@ -144,7 +144,7 @@
 				on:click={() => viewTypeList.set(true)}
 			>
 				<LayoutGrid
-					class="w-6 stroke-accents2 transition hover:stroke-primary group-aria-checked:stroke-primary"
+					class="w-6 stroke-accents2 transition hover:stroke-primary group-focus:stroke-primary group-aria-checked:stroke-primary"
 				/>
 			</button>
 		</div>

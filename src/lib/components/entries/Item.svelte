@@ -57,7 +57,7 @@
 			</h3>
 		</a>
 		<button
-			class="sm:hidden group-focus-within:inline-block group-hover:inline-block"
+			class="group-focus-within:inline-block group-hover:inline-block sm:hidden"
 			on:click={() => {
 				modalConfirm = true;
 			}}

@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import Nav from '$lib/components/nav/Nav.svelte';
 	import { currentPath } from '$lib/store/currentPath';
+
 	import '../app.css';
 
 	// Sets the current path from page params
@@ -10,10 +11,10 @@
 </script>
 
 <svelte:head>
-	<title>{$currentPath.currentDirName}</title>
+	<title>{$currentPath.currentEntryName}</title>
 </svelte:head>
 
 <Nav />
-<main class="mt-[70px]">
+<main>
 	<slot />
 </main>

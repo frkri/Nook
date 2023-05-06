@@ -13,7 +13,7 @@
 
 @layer components {
 	.button {
-		@apply flex h-[40px] items-center gap-2 rounded-lg border border-inherit bg-foreground p-1.5 font-bold text-inherit transition hover:bg-background hover:text-inherit;
+		@apply flex h-[40px] items-center gap-2 rounded-lg border border-inherit bg-foreground p-1.5 font-bold text-inherit outline-none transition focus-within:bg-background focus-within:text-primary hover:bg-background hover:text-primary focus:bg-background focus:text-primary;
 
 		transition: ease-in-out 0.1s;
 		transition-property: color, border-color, background-color;
@@ -35,5 +35,9 @@
 
 	.normal {
 		@apply border-foreground bg-foreground text-background hover:text-foreground;
+	}
+
+	.secondary {
+		@apply border-accents2 bg-background text-secondary hover:text-foreground;
 	}
 }
