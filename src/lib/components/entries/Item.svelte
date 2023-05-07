@@ -1,16 +1,24 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { getDirEntryHandle, removeEntries } from '$lib/client/explorer';
+	import ActionModal from '$lib/components/popup/actionModal.svelte';
+	import { currentPath } from '$lib/store/currentPath';
 	import { Trash } from 'lucide-svelte';
-	import ActionModal from '../popup/actionModal.svelte';
 
 	export let entry: EntryData;
 
 	let modalConfirm = false;
+
+	// Builds path to next entry
+	$: prefix = entry.type === 'directory' ? '/explorer/' : '/editor/';
+	$: entryPath =
+		prefix +
+		$currentPath.pathID.join('/') +
+		($currentPath.pathID.length === 0 ? '' : '/') +
+		entry.id;
 </script>
 
-<ActionModal bind:open={modalConfirm} title="Delete {entry.type}">
+<ActionModal bind:open={modalConfirm} title="Delete {entry.type}?">
 	<p class="line-clamp-3">
 		Are you sure you want to delete <span class="font-bold">{entry.name}</span> and all of its contents?
 	</p>
@@ -28,7 +36,7 @@
 			on:click={async () => {
 				modalConfirm = false;
 				await removeEntries([entry.id], await getDirEntryHandle(entry.id));
-				invalidate('entries:loader');
+				invalidate('entries:explorer-loader');
 			}}
 		>
 			Confirm
@@ -40,7 +48,7 @@
 	class="group flex w-full cursor-pointer flex-col gap-2 rounded-lg border border-accents2 p-3 hover:border-accents5"
 >
 	<header class="flex items-center gap-3">
-		<a href={$page.url.pathname + '/' + entry.id} class="flex flex-1 items-center gap-3">
+		<a href={entryPath} class="flex flex-1 items-center gap-3">
 			<span class="inline-flex w-9 items-center justify-center rounded-lg bg-accents2 p-1 text-xl">
 				{entry.icon}
 			</span>
@@ -49,7 +57,7 @@
 			</h3>
 		</a>
 		<button
-			class="sm:hidden group-focus-within:inline-block group-hover:inline-block"
+			class="group-focus-within:inline-block group-hover:inline-block sm:hidden"
 			on:click={() => {
 				modalConfirm = true;
 			}}

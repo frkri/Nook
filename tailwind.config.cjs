@@ -25,5 +25,5 @@ export default {
 			warn: '#f5a623'
 		}
 	},
-	plugins: []
+	plugins: [require('@tailwindcss/typography')]
 };
