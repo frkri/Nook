@@ -8,7 +8,12 @@
 	} from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
-	import { autoSaveDelay, autoSaveEditor, viewTypeEditor } from '$lib/store/userPreferences';
+	import {
+		autoBroadcastState,
+		autoSaveDelay,
+		autoSaveEditor,
+		viewTypeEditor
+	} from '$lib/store/userPreferences';
 	import {
 		Check,
 		ChevronDown,
@@ -27,6 +32,7 @@
 
 	export let entry: EntryData;
 	export let entryHandle: FileSystemFileHandle;
+	export let bc: BroadcastChannel;
 
 	let isMaximized = document.fullscreenElement !== null;
 
@@ -36,6 +42,11 @@
 	let entryContent = '';
 	onMount(async () => {
 		entryContent = (await readEntryContents(entryHandle)) || '';
+		bc.onmessage = (e) => {
+			if (e.data.type === 'save-file') {
+				entryContent = e.data.content;
+			}
+		};
 	});
 
 	let recentlySaved = false;
@@ -46,8 +57,9 @@
 		// Reset timeout
 		if (saveTimeout) clearTimeout(saveTimeout);
 
-		saveTimeout = setTimeout(() => {
+		saveTimeout = setTimeout(async () => {
 			writeEntryContents(entryHandle, entryContent);
+			if ($autoBroadcastState) bc.postMessage({ type: 'save-file', content: entryContent });
 
 			recentlySaved = true;
 			setTimeout(() => {
@@ -104,6 +116,18 @@
 				class="border-main w-20 bg-background p-2 font-bold text-primary"
 				bind:value={$autoSaveDelay}
 			/>
+		</div>
+		<div class="flex items-center justify-between gap-2">
+			<label for="autoBroadcastState">Broadcast file updates</label>
+			<button
+				class="button normal flex w-20 items-center justify-center"
+				id="autoBroadcastState"
+				on:click={() => {
+					$autoBroadcastState = !$autoBroadcastState;
+				}}
+			>
+				{$autoBroadcastState ? 'On' : 'Off'}
+			</button>
 		</div>
 	</div>
 </ActionModal>
@@ -233,11 +257,9 @@
 				{@html snarkdown(entryContent)}
 			</div>
 		{:else}
-			<div
+			<textarea
 				on:input={$autoSaveEditor ? handleSave : undefined}
-				bind:innerText={entryContent}
-				contenteditable
-				role="textbox"
+				bind:value={entryContent}
 				class="min-h-screen w-full rounded border border-accents3 bg-inherit pl-2 pr-2"
 			/>
 		{/if}

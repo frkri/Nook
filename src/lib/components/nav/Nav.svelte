@@ -53,6 +53,9 @@
 				inputOpen = false;
 				await createEntries([newEntry], await getDirEntryHandle($currentPath.currentEntryID));
 				await invalidate('entries:explorer-loader');
+				// Reset the newEntry object
+				newEntry.name = '';
+				newEntry.icon = '';
 			}}
 		>
 			Create
