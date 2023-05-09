@@ -1,3 +1,5 @@
+import type { EntryData } from '$lib/types';
+
 import { resolveEntriesByID, resolveEntriesByName } from '$lib/client/explorer';
 import { writable } from 'svelte/store';
 

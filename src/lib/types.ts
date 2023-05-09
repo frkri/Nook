@@ -1,10 +1,10 @@
-interface EntryDataBasic {
+export interface EntryDataBasic {
 	name: string;
 	icon: string;
 	type: EntryType;
 }
 
-interface EntryData extends EntryDataBasic {
+export interface EntryData extends EntryDataBasic {
 	id: string; // UUID
 	created: number; // Timestamp
 	modified: number; // Timestamp
@@ -16,4 +16,4 @@ const EntryType = {
 	File: 'file'
 } as const;
 
-type EntryType = (typeof EntryType)[keyof typeof EntryType];
+export type EntryType = (typeof EntryType)[keyof typeof EntryType];

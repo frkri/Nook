@@ -11,10 +11,10 @@
 </script>
 
 <svelte:head>
-	<title>{$currentPath.currentEntryName}</title>
+	<title>{$currentPath.currentEntryName ?? 'Nook.'}</title>
 </svelte:head>
 
 <Nav />
-<main>
+<main class="mt-[65px] h-full">
 	<slot />
 </main>

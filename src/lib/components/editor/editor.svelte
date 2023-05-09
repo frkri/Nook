@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import {
-		getDirEntryHandle,
-		readEntryContents,
-		removeEntries,
-		writeEntryContents
-	} from '$lib/client/explorer';
+	import type { EntryData } from '$lib/types';
+
+	import { readEntryContents, writeEntryContents } from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
-	import { autoSaveDelay, autoSaveEditor, viewTypeEditor } from '$lib/store/userPreferences';
+	import {
+		autoBroadcastState,
+		autoSaveDelay,
+		autoSaveEditor,
+		viewTypeEditor
+	} from '$lib/store/userPreferences';
 	import {
 		Check,
 		ChevronDown,
@@ -24,9 +25,11 @@
 	} from 'lucide-svelte';
 	import snarkdown from 'snarkdown';
 	import { onMount } from 'svelte';
+	import DeleteEntryModal from '../popup/deleteEntryModal.svelte';
 
 	export let entry: EntryData;
 	export let entryHandle: FileSystemFileHandle;
+	export let bc: BroadcastChannel;
 
 	let isMaximized = document.fullscreenElement !== null;
 
@@ -36,6 +39,11 @@
 	let entryContent = '';
 	onMount(async () => {
 		entryContent = (await readEntryContents(entryHandle)) || '';
+		bc.onmessage = (e) => {
+			if (e.data.type === 'save-file') {
+				entryContent = e.data.content;
+			}
+		};
 	});
 
 	let recentlySaved = false;
@@ -46,8 +54,9 @@
 		// Reset timeout
 		if (saveTimeout) clearTimeout(saveTimeout);
 
-		saveTimeout = setTimeout(() => {
+		saveTimeout = setTimeout(async () => {
 			writeEntryContents(entryHandle, entryContent);
+			if ($autoBroadcastState) bc.postMessage({ type: 'save-file', content: entryContent });
 
 			recentlySaved = true;
 			setTimeout(() => {
@@ -57,34 +66,11 @@
 	}
 </script>
 
-<ActionModal bind:open={modalDeleteConfirm} title="Delete {entry.type}?">
-	<p class="line-clamp-3">
-		Are you sure you want to delete <span class="font-bold">{entry.name}</span> and all of its contents?
-	</p>
-	<div class="flex justify-around">
-		<button
-			class="button secondary"
-			on:click={() => {
-				modalDeleteConfirm = false;
-			}}
-		>
-			Cancel
-		</button>
-		<button
-			class="button alert"
-			on:click={async () => {
-				modalDeleteConfirm = false;
-				await removeEntries([entry.id], await getDirEntryHandle(entry.id));
-				await goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
-			}}
-		>
-			Confirm
-		</button>
-	</div>
-</ActionModal>
+<DeleteEntryModal {entry} {modalDeleteConfirm} />
+
 <ActionModal bind:open={modalSaveOptions} title="Save options">
 	<div class="flex flex-col justify-between gap-2">
-		<div class="flex items-center justify-between gap-2">
+		<div class="flex items-center justify-between">
 			<label for="autoSaveToggle">Autosave</label>
 			<button
 				class="button normal flex w-20 items-center justify-center"
@@ -96,57 +82,57 @@
 				{$autoSaveEditor ? 'On' : 'Off'}
 			</button>
 		</div>
-		<div class="flex items-center justify-between gap-2">
+		<div class="flex items-center justify-between">
+			<label for="autoBroadcastState">Broadcast file updates</label>
+			<button
+				class="button normal flex w-20 items-center justify-center"
+				id="autoBroadcastState"
+				on:click={() => {
+					$autoBroadcastState = !$autoBroadcastState;
+				}}
+			>
+				{$autoBroadcastState ? 'On' : 'Off'}
+			</button>
+		</div>
+		<div class="flex items-center justify-between">
 			<label for="autoSaveDelay">Autosave delay (ms)</label>
 			<input
 				id="autoSaveDelay"
 				type="number"
-				class="border-main w-20 bg-background p-2 font-bold text-primary"
+				class="border-main w-20 p-2 font-bold text-primary dark:bg-background"
 				bind:value={$autoSaveDelay}
 			/>
 		</div>
 	</div>
 </ActionModal>
 
-<main class="flex flex-1 flex-col gap-5 p-2">
+<main class="flex h-[90%] flex-col gap-2 p-2">
 	<div class="flex justify-between">
 		<div class="flex flex-col">
 			<button class="button secondary mb-2 flex justify-between">Export <Download /></button>
 			<div
-				class="flex h-10 justify-between rounded-lg border border-accents2 p-1"
+				class="flex h-10 justify-between rounded-lg border border-accents4 p-1 dark:aria-checked:bg-accents2"
 				role="radiogroup"
 			>
 				<button
-					class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
+					class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
 					aria-checked={!$viewTypeEditor}
 					aria-label="Switch to edit mode"
 					role="radio"
 					on:click={() => viewTypeEditor.set(false)}
 				>
-					<Edit
-						class="w-6 stroke-accents2 transition group-hover:stroke-primary group-focus:stroke-primary group-aria-checked:stroke-primary"
-					/>
-					<span
-						class="flex-1 text-secondary transition group-hover:text-primary group-focus:stroke-primary group-aria-checked:text-primary"
-					>
-						Edit
-					</span>
+					<Edit class="switch w-6" />
+					<span class="switch flex-1"> Edit </span>
 				</button>
 				<button
-					class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden sm:aria-[checked='true']:flex"
+					class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
 					aria-checked={$viewTypeEditor}
 					aria-label="Switch to preview mode"
 					role="radio"
 					on:click={() => viewTypeEditor.set(true)}
 				>
-					<FileText
-						class="w-6 stroke-accents2 transition group-hover:stroke-primary group-focus:stroke-primary group-aria-checked:stroke-primary"
-					/>
-					<span
-						class="flex-1 text-secondary transition group-hover:text-primary group-focus:stroke-primary group-aria-checked:text-primary"
-					>
-						Preview
-					</span>
+					<FileText class="switch w-6" />
+					<span class="switch flex-1"> Preview </span>
 				</button>
 			</div>
 		</div>
@@ -190,7 +176,7 @@
 				</button>
 			</div>
 			<div class="mt-2 flex gap-2">
-				<div class="button flex flex-1 justify-between text-background">
+				<div class="button normal flex flex-1 justify-between">
 					<button
 						class="text-inherit"
 						aria-label="Save current file"
@@ -227,18 +213,16 @@
 			</div>
 		</menu>
 	</div>
-	<div class="min-h-screen bg-background">
+	<div class="h-full dark:bg-background">
 		{#if $viewTypeEditor}
-			<div class="prose w-full pl-2 pr-2 dark:prose-invert md:prose-xl">
+			<div class="prose h-full w-full overflow-scroll pl-2 pr-2 dark:prose-invert md:prose-xl">
 				{@html snarkdown(entryContent)}
 			</div>
 		{:else}
-			<div
+			<textarea
 				on:input={$autoSaveEditor ? handleSave : undefined}
-				bind:innerText={entryContent}
-				contenteditable
-				role="textbox"
-				class="min-h-screen w-full rounded border border-accents3 bg-inherit pl-2 pr-2"
+				bind:value={entryContent}
+				class="h-full w-full rounded border border-accents3 bg-inherit pl-2 pr-2"
 			/>
 		{/if}
 	</div>

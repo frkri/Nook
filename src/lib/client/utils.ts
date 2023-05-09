@@ -1,4 +1,5 @@
 // Using @types/wicg-file-system-access for FileSystem API types support
+import type { EntryData } from '$lib/types';
 
 /**
  * Walk the directory tree to get the directory handle of a directory or file using its name

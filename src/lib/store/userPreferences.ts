@@ -41,8 +41,20 @@ autoSaveEditor.subscribe((value) => {
  * Creates a Store for delay of auto saving Editor Files that also writes to localStorage
  * NOTE: LocalStorage only stores strings, meaning we need to convert the bool to string!
  */
-export const autoSaveDelay = writable<number>(Number(localStorage.getItem('autoSaveDelay')) || 400);
+export const autoSaveDelay = writable<number>(Number(localStorage.getItem('autoSaveDelay')) || 800);
 
 autoSaveDelay.subscribe((value) => {
 	localStorage.setItem('autoSaveDelay', value.toString());
+});
+
+/*
+ * Creates a Store for delay of auto saving Editor Files that also writes to localStorage
+ * NOTE: LocalStorage only stores strings, meaning we need to convert the bool to string!
+ */
+export const autoBroadcastState = writable<boolean>(
+	localStorage.getItem('autoBroadcastState') === 'true'
+);
+
+autoBroadcastState.subscribe((value) => {
+	localStorage.setItem('autoBroadcastState', value.toString());
 });

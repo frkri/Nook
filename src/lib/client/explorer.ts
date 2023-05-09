@@ -1,4 +1,6 @@
 // Using @types/wicg-file-system-access for FileSystem API types support
+import type { EntryData, EntryDataBasic } from '$lib/types';
+
 import { db } from '$lib/client/db';
 import { getMapEntryByName, walkDirectory } from '../client/utils';
 

@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 @layer base {
-	html {
-		@apply overflow-y-scroll bg-background text-foreground;
+	html,
+	body {
+		@apply mx-auto h-full max-w-[3000px] overflow-y-scroll dark:bg-background dark:text-foreground;
 
 		transition: ease-in-out 0.1s;
 		transition-property: color, border-color;
@@ -13,20 +14,20 @@
 
 @layer components {
 	.button {
-		@apply flex h-[40px] items-center gap-2 rounded-lg border border-inherit bg-foreground p-1.5 font-bold text-inherit outline-none transition focus-within:bg-background focus-within:text-primary hover:bg-background hover:text-primary focus:bg-background focus:text-primary;
+		@apply flex h-[40px] items-center gap-2 rounded-lg border border-inherit p-1.5 font-bold outline-none;
 
 		transition: ease-in-out 0.1s;
 		transition-property: color, border-color, background-color;
 	}
 
 	.border-main {
-		@apply rounded-lg border border-accents2 bg-background;
+		@apply rounded-lg border border-accents2 bg-background outline-none focus:border-accents2 dark:border-accents4 dark:focus:border-accents7;
 	}
 }
 
 @layer utilities {
 	.alert {
-		@apply border-alert bg-alert  hover:text-alert;
+		@apply border-alert bg-alert text-foreground hover:bg-foreground hover:text-alert dark:hover:bg-background;
 	}
 
 	.warn {
@@ -34,10 +35,14 @@
 	}
 
 	.normal {
-		@apply border-foreground bg-foreground text-background hover:text-foreground;
+		@apply border-background bg-background text-foreground hover:bg-foreground hover:text-background focus:bg-foreground focus:text-background dark:border-foreground dark:bg-foreground dark:text-background dark:hover:bg-background dark:hover:text-foreground dark:focus:bg-background dark:focus:text-foreground;
 	}
 
 	.secondary {
-		@apply border-accents2 bg-background text-secondary hover:text-foreground;
+		@apply border-accents6 bg-foreground text-secondary hover:border-background hover:text-background focus:border-background focus:text-background dark:bg-background dark:hover:border-foreground dark:hover:text-foreground dark:focus:border-foreground dark:focus:text-foreground;
+	}
+
+	.switch {
+		@apply stroke-secondary text-secondary transition group-hover:stroke-background group-hover:text-background group-focus:stroke-background group-aria-checked:stroke-primary group-aria-checked:text-primary dark:group-hover:stroke-primary dark:group-hover:text-primary dark:group-focus:stroke-primary dark:group-focus:text-primary;
 	}
 }
