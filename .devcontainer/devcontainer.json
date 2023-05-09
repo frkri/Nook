@@ -14,6 +14,9 @@
 	"postCreateCommand": "pnpm install",
 	"customizations": {
 		"vscode": {
+			"settings": {
+				"svelte.enable-ts-plugin": true
+			},
 			"extensions": [
 				"svelte.svelte-vscode",
 				"esbenp.prettier-vscode",
