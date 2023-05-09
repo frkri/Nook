@@ -1,3 +1,5 @@
+import type { EntryData } from '$lib/types';
+
 import { getDirEntryHandle, getEntriesByID } from '$lib/client/explorer';
 import { iterToArray } from '$lib/client/utils';
 import { error } from '@sveltejs/kit';

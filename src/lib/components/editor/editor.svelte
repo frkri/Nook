@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { EntryData } from '$lib/types';
+
 	import { readEntryContents, writeEntryContents } from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';

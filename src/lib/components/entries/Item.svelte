@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { EntryData } from '$lib/types';
+
 	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import { Trash } from 'lucide-svelte';

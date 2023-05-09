@@ -1,3 +1,5 @@
+import type { EntryData } from '$lib/types';
+
 import { browser, building } from '$app/environment';
 import { openDB, type DBSchema } from 'idb';
 

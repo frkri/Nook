@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { EntryData } from '$lib/types';
+
 	import { goto, invalidate } from '$app/navigation';
 	import { getDirEntryHandle, removeEntries } from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';

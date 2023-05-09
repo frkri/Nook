@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { EntryDataBasic } from '$lib/types';
+
 	import { goto, invalidate } from '$app/navigation';
 	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
