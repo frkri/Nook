@@ -11,9 +11,13 @@ export interface EntryData extends EntryDataBasic {
 	description: string;
 }
 
-const EntryType = {
+const entryType = {
 	Directory: 'directory',
 	File: 'file'
 } as const;
 
-export type EntryType = (typeof EntryType)[keyof typeof EntryType];
+export type EntryType = (typeof entryType)[keyof typeof entryType];
+
+export const broadcastMessage = {
+	SaveFile: 'save-file'
+} as const;

@@ -5,10 +5,7 @@
 @layer base {
 	html,
 	body {
-		@apply mx-auto h-full max-w-[3000px] overflow-y-scroll dark:bg-background dark:text-foreground;
-
-		transition: ease-in-out 0.1s;
-		transition-property: color, border-color;
+		@apply mx-auto dark:bg-background dark:text-foreground;
 	}
 }
 

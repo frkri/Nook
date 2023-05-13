@@ -28,6 +28,7 @@
 			class="button alert"
 			on:click={async () => {
 				modalDeleteConfirm = false;
+
 				await removeEntries([entry.id], await getDirEntryHandle(entry.id));
 				await goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
 				invalidate('entries:explorer-loader');

@@ -59,3 +59,25 @@ export async function iterToArray<T>(iter: AsyncIterable<T>): Promise<T[]> {
 	}
 	return arr;
 }
+
+/**
+ * Download a file based on its name, extension, type and data
+ * @param name
+ * @param extension
+ * @param type MIME type
+ * @param data
+ */
+export async function downloadFile(name: string, extension: string, type: string, data: string) {
+	const blob = new Blob([data], { type });
+	const url = URL.createObjectURL(blob);
+
+	const link = document.createElement('a');
+	link.href = url;
+	link.download = `${name}.${extension}`;
+
+	link.click();
+
+	// Cleanup
+	URL.revokeObjectURL(url);
+	link.remove();
+}
