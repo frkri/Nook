@@ -270,6 +270,6 @@
 		on:input={$autoSaveEditor ? handleSave : undefined}
 		bind:value={entryContent}
 		class:hidden={$viewTypeEditor}
-		class="h-[calc(100vh-200px)] w-full resize-none rounded border border-accents3 bg-inherit px-2 leading-7"
+		class="h-[calc(100vh-200px)] w-full resize-none rounded border border-accents6 bg-inherit px-2 leading-7 outline-none dark:focus:border-accents7 focus:border-accents1"
 	/>
 </div>
