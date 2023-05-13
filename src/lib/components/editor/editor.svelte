@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { EntryData } from '$lib/types';
+	import { broadcastMessage, type EntryData } from '$lib/types';
 
 	import { readEntryContents, writeEntryContents } from '$lib/client/explorer';
+	import { downloadFile } from '$lib/client/utils';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import {
@@ -13,6 +14,7 @@
 	import {
 		Check,
 		ChevronDown,
+		Code2,
 		Copy,
 		Download,
 		Edit,
@@ -24,30 +26,40 @@
 		Trash
 	} from 'lucide-svelte';
 	import snarkdown from 'snarkdown';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import DeleteEntryModal from '../popup/deleteEntryModal.svelte';
 
 	export let entry: EntryData;
 	export let entryHandle: FileSystemFileHandle;
-	export let bc: BroadcastChannel;
 
 	let isMaximized = document.fullscreenElement !== null;
 
 	let modalDeleteConfirm = false;
 	let modalSaveOptions = false;
+	let modalExportFile = false;
 
 	let entryContent = '';
+	let entryContentHTML = '';
+	let bc: BroadcastChannel;
 	onMount(async () => {
 		entryContent = (await readEntryContents(entryHandle)) || '';
+		entryContentHTML = snarkdown(entryContent);
+		bc = new BroadcastChannel(`editor:${entry.id}`);
+
 		bc.onmessage = (e) => {
-			if (e.data.type === 'save-file') {
-				entryContent = e.data.content;
+			switch (e.data.type) {
+				case broadcastMessage.SaveFile:
+					entryContent = e.data.content;
+					entryContentHTML = snarkdown(entryContent);
+					break;
 			}
 		};
 	});
+	onDestroy(() => {
+		bc.close();
+	});
 
 	let recentlySaved = false;
-
 	// Tries to save after a delay if no other saves are triggered in the meantime
 	let saveTimeout: number | null = null;
 	async function handleSave() {
@@ -56,7 +68,9 @@
 
 		saveTimeout = setTimeout(async () => {
 			writeEntryContents(entryHandle, entryContent);
-			if ($autoBroadcastState) bc.postMessage({ type: 'save-file', content: entryContent });
+
+			if ($autoBroadcastState)
+				bc.postMessage({ type: broadcastMessage.SaveFile, content: entryContent });
 
 			recentlySaved = true;
 			setTimeout(() => {
@@ -106,124 +120,156 @@
 	</div>
 </ActionModal>
 
-<main class="flex h-[90%] flex-col gap-2 p-2">
-	<div class="flex justify-between">
-		<div class="flex flex-col">
-			<button class="button secondary mb-2 flex justify-between">Export <Download /></button>
-			<div
-				class="flex h-10 justify-between rounded-lg border border-accents4 p-1 dark:aria-checked:bg-accents2"
-				role="radiogroup"
+<!-- Export Modal -->
+<ActionModal bind:open={modalExportFile}>
+	<button
+		role="menuitem"
+		aria-label="Export as Markdown file"
+		id="folder"
+		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
+		on:click={() => {
+			downloadFile(entry.name, 'md', 'text/plain', entryContent);
+			modalExportFile = false;
+		}}><FileText class="w-4" />Markdown</button
+	>
+	<button
+		role="menuitem"
+		aria-label="Export as HTML file"
+		id="note"
+		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
+		on:click={() => {
+			entryContentHTML = snarkdown(entryContent);
+			downloadFile(entry.name, 'html', 'text/html', entryContentHTML);
+			modalExportFile = false;
+		}}><Code2 class="w-4" />HTML</button
+	>
+</ActionModal>
+
+<menu class="z-10 flex w-full justify-between p-2 xl:fixed xl:top-[60px]">
+	<div class="flex flex-col">
+		<button
+			class="button secondary mb-2 flex justify-between"
+			on:click={() => {
+				modalExportFile = true;
+			}}>Export<Download /></button
+		>
+		<div
+			class="flex h-10 justify-between rounded-lg border border-accents4 p-1 dark:aria-checked:bg-accents2"
+			role="radiogroup"
+		>
+			<button
+				class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
+				aria-checked={!$viewTypeEditor}
+				aria-label="Switch to edit mode"
+				role="radio"
+				on:click={() => viewTypeEditor.set(false)}
 			>
-				<button
-					class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
-					aria-checked={!$viewTypeEditor}
-					aria-label="Switch to edit mode"
-					role="radio"
-					on:click={() => viewTypeEditor.set(false)}
-				>
-					<Edit class="switch w-6" />
-					<span class="switch flex-1"> Edit </span>
-				</button>
-				<button
-					class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
-					aria-checked={$viewTypeEditor}
-					aria-label="Switch to preview mode"
-					role="radio"
-					on:click={() => viewTypeEditor.set(true)}
-				>
-					<FileText class="switch w-6" />
-					<span class="switch flex-1"> Preview </span>
-				</button>
-			</div>
+				<Edit class="switch w-6" />
+				<span class="switch flex-1">Edit</span>
+			</button>
+			<button
+				class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
+				aria-checked={$viewTypeEditor}
+				aria-label="Switch to preview mode"
+				role="radio"
+				on:click={() => {
+					viewTypeEditor.set(true);
+					entryContentHTML = snarkdown(entryContent);
+				}}
+			>
+				<FileText class="switch w-6" />
+				<span class="switch flex-1">Preview</span>
+			</button>
 		</div>
-		<menu class="flex flex-col">
-			<div class="flex gap-2">
+	</div>
+	<div class="flex flex-col">
+		<div class="flex gap-2">
+			<button
+				class="button secondary"
+				aria-label="Copy current file to clipboard"
+				on:click={() => {
+					navigator.clipboard.writeText(entryContent);
+				}}
+			>
+				<Copy />
+			</button>
+			<a
+				href="/editor/{$currentPath.pathID.join('/')}"
+				target="_blank"
+				class="button secondary"
+				aria-label="Open current file in new tab"
+			>
+				<ExternalLink />
+			</a>
+			<button
+				class="button secondary"
+				aria-label="Maximize current file"
+				on:click={() => {
+					if (isMaximized) {
+						document.exitFullscreen();
+						isMaximized = false;
+					} else {
+						document.documentElement.requestFullscreen();
+						isMaximized = true;
+					}
+				}}
+			>
+				{#if isMaximized}
+					<Minimize />
+				{:else}
+					<Maximize />
+				{/if}
+			</button>
+		</div>
+		<div class="mt-2 flex gap-2">
+			<div class="button normal flex flex-1 justify-between">
 				<button
-					class="button secondary"
-					aria-label="Copy current file to clipboard"
+					class="text-inherit"
+					aria-label="Save current file"
 					on:click={() => {
-						navigator.clipboard.writeText(entryContent);
+						handleSave();
+						recentlySaved = true;
 					}}
 				>
-					<Copy />
-				</button>
-				<a
-					href="/editor/{$currentPath.pathID.join('/')}"
-					target="_blank"
-					class="button secondary"
-					aria-label="Open current file in new tab"
-				>
-					<ExternalLink />
-				</a>
-				<button
-					class="button secondary"
-					aria-label="Maximize current file"
-					on:click={() => {
-						if (isMaximized) {
-							document.exitFullscreen();
-							isMaximized = false;
-						} else {
-							document.documentElement.requestFullscreen();
-							isMaximized = true;
-						}
-					}}
-				>
-					{#if isMaximized}
-						<Minimize />
+					{#if recentlySaved}
+						<Check color="#29bc9b" />
 					{:else}
-						<Maximize />
+						<Save />
 					{/if}
 				</button>
-			</div>
-			<div class="mt-2 flex gap-2">
-				<div class="button normal flex flex-1 justify-between">
-					<button
-						class="text-inherit"
-						aria-label="Save current file"
-						on:click={() => {
-							handleSave();
-							recentlySaved = true;
-						}}
-					>
-						{#if recentlySaved}
-							<Check color="#29bc9b" />
-						{:else}
-							<Save />
-						{/if}
-					</button>
-					<button
-						class="text-inherit"
-						aria-label="Toggle save options menu"
-						on:click={() => {
-							modalSaveOptions = true;
-						}}
-					>
-						<ChevronDown />
-					</button>
-				</div>
 				<button
-					class="button alert"
-					aria-label="Delete current file"
+					class="text-inherit"
+					aria-label="Toggle save options menu"
 					on:click={() => {
-						modalDeleteConfirm = true;
+						modalSaveOptions = true;
 					}}
 				>
-					<Trash />
+					<ChevronDown />
 				</button>
 			</div>
-		</menu>
+			<button
+				class="button alert"
+				aria-label="Delete current file"
+				on:click={() => {
+					modalDeleteConfirm = true;
+				}}
+			>
+				<Trash />
+			</button>
+		</div>
 	</div>
-	<div class="h-full dark:bg-background">
-		{#if $viewTypeEditor}
-			<div class="prose h-full w-full overflow-scroll pl-2 pr-2 dark:prose-invert md:prose-xl">
-				{@html snarkdown(entryContent)}
-			</div>
-		{:else}
-			<textarea
-				on:input={$autoSaveEditor ? handleSave : undefined}
-				bind:value={entryContent}
-				class="h-full w-full rounded border border-accents3 bg-inherit pl-2 pr-2"
-			/>
-		{/if}
-	</div>
-</main>
+</menu>
+
+<div class="flex flex-1 justify-center px-2 dark:bg-background xl:mt-[180px]">
+	{#if $viewTypeEditor}
+		<div class="prose dark:prose-invert xl:prose-xl">
+			{@html entryContentHTML}
+		</div>
+	{/if}
+	<textarea
+		on:input={$autoSaveEditor ? handleSave : undefined}
+		bind:value={entryContent}
+		class:hidden={$viewTypeEditor}
+		class="h-[calc(100vh-200px)] w-full resize-none rounded border border-accents6 bg-inherit px-2 leading-7 outline-none dark:focus:border-accents7 focus:border-accents1"
+	/>
+</div>

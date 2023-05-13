@@ -95,7 +95,7 @@
 </ActionModal>
 
 <nav
-	class="fixed z-10 flex h-[60px] w-full items-center border-b border-b-accents2 pl-5 pr-5 dark:bg-background"
+	class="fixed top-0 z-10 flex h-[60px] w-full items-center border-b border-b-accents2 pl-5 pr-5 dark:bg-background"
 >
 	<div class="group flex h-[40px] w-full gap-2">
 		<!-- Navigation path and back button -->
@@ -110,7 +110,7 @@
 				<ChevronLeft />
 			</a>
 			<input
-				class="flex-1 outline-none dark:bg-background"
+				class="flex-1 bg-foreground outline-none dark:bg-background"
 				aria-label="Navigation path input field"
 				bind:value={pathInput}
 				on:change={async () => {
