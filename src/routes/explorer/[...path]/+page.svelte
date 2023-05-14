@@ -20,7 +20,7 @@
 		id="directories-list"
 		role="list"
 		aria-label="List of directories"
-		class="grid-cols-[repeat(auto-fit,minmax(220px,1fr))] flex-col gap-1"
+		class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 xl:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
 	>
 		{#each dirEntries as item (item.id)}
 			<Item entry={item} />
@@ -37,7 +37,7 @@
 		class:flex={!$viewTypeList}
 		role="list"
 		aria-label="List of notes"
-		class="grid-cols-[repeat(auto-fit,minmax(220px,1fr))] flex-col gap-1"
+		class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 xl:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
 	>
 		{#each fileEntries as item (item.id)}
 			<Item entry={item} />

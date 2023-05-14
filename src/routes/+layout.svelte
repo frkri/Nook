@@ -26,7 +26,6 @@
 </script>
 
 <svelte:head>
-	{console.log($currentPath.currentEntryName)}
 	<title>{$currentPath.currentEntryName === '' ? 'Nook.' : $currentPath.currentEntryName}</title>
 </svelte:head>
 
