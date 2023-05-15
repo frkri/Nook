@@ -18,7 +18,7 @@
 	}
 
 	.border-main {
-		@apply rounded-lg border border-accents2 bg-background outline-none focus:border-accents2 dark:border-accents4 dark:focus:border-accents7;
+		@apply rounded-lg border border-accents2 outline-none focus:border-accents2 dark:border-accents4 dark:focus:border-accents7;
 	}
 }
 

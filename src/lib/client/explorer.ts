@@ -16,7 +16,7 @@ const handleCache = new Map<string, FileSystemDirectoryHandle>();
 
 /**
  * Get multiple entries from the database using IDs
- * @param ids
+ * @param IDs
  * @returns Array with Entries, or null if not found
  */
 export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[]> {
@@ -27,6 +27,8 @@ export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[
 	// If it's not in either, return null
 	const entries = await Promise.all(
 		ids.map(async (id) => {
+			if (id === 'root' || id === '') return null;
+
 			// Check cache for entry
 			let entry = entryCache.get(id);
 
@@ -55,7 +57,7 @@ export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[
 
 /**
  * Get multiple entries from the database using names
- * @param names
+ * @param Names
  * @returns Array with resolved Entries, or null if not found
  */
 export async function getEntriesByName(names: string[]): Promise<(EntryData | null)[]> {
@@ -96,7 +98,7 @@ export async function getEntriesByName(names: string[]): Promise<(EntryData | nu
 /**
  * Helper function to resolve entries using IDs
  * Meant to be used with a path array and to verify whether the path exists
- * @param Array of IDs
+ * @param IDs
  * @returns Array of entries data until and excluding the first null entry
  */
 export async function resolveEntriesByID(path: string[]): Promise<EntryData[]> {
@@ -139,9 +141,6 @@ export async function createEntries(
 
 	console.log('Creating entries', newEntries, 'in', currentDirHandle);
 
-	// Open new transaction
-	const tx = db.transaction('entries', 'readwrite');
-
 	for await (const newEntry of newEntries) {
 		const entry: EntryData = {
 			id: crypto.randomUUID(),
@@ -150,6 +149,9 @@ export async function createEntries(
 			description: '',
 			...newEntry
 		};
+
+		// Open new transaction
+		const tx = db.transaction('entries', 'readwrite');
 
 		// Add entry to database, throw error if it already exists (shouldn't happen with UUIDs)
 		if ((await tx.store.add(entry)) === undefined)

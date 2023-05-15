@@ -260,9 +260,9 @@
 	</div>
 </menu>
 
-<div class="flex flex-1 justify-center px-2 dark:bg-background xl:mt-[180px]">
+<div class="flex items-center justify-center px-2 dark:bg-background xl:mt-[180px]">
 	{#if $viewTypeEditor}
-		<div class="prose overflow-scroll dark:prose-invert xl:prose-xl">
+		<div class="prose px-2 dark:prose-invert xl:prose-xl">
 			{@html entryContentHTML}
 		</div>
 	{/if}

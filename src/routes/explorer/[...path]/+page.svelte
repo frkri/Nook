@@ -1,46 +1,57 @@
 <script lang="ts">
 	import Item from '$lib/components/entries/Item.svelte';
 	import { viewTypeList } from '$lib/store/userPreferences.js';
+	import { Plus } from 'lucide-svelte';
 
 	export let data;
 
 	$: ({ dirEntries, fileEntries } = data);
 </script>
 
-<div class="m-3 my-12 flex flex-col gap-8">
+<div class="m-3 pt-6 flex flex-col gap-8">
+	{#if dirEntries.length === 0 && fileEntries.length === 0}
+		<div class="mx-auto flex flex-col items-center font-bold gap-4">
+			<p>No entries found! Create new items using the</p>
+			<Plus size={35} class="button" />
+		</div>
+	{/if}
+
 	{#if dirEntries.length > 0}
 		<span class="mx-auto text-2xl font-bold dark:text-primary"
 			>{dirEntries.length}
 			{dirEntries.length === 1 ? 'Directory' : 'Directories'}
 		</span>
+
+		<div
+			class:grid={$viewTypeList}
+			class:flex={!$viewTypeList}
+			id="directories-list"
+			role="list"
+			aria-label="List of directories"
+			class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 xl:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
+		>
+			{#each dirEntries as entry (entry.id)}
+				<Item {entry} />
+			{/each}
+		</div>
 	{/if}
-	<div
-		class:grid={$viewTypeList}
-		class:flex={!$viewTypeList}
-		id="directories-list"
-		role="list"
-		aria-label="List of directories"
-		class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 xl:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
-	>
-		{#each dirEntries as item (item.id)}
-			<Item entry={item} />
-		{/each}
-	</div>
+
 	{#if fileEntries.length > 0}
 		<span class="mx-auto text-2xl font-bold dark:text-primary"
 			>{fileEntries.length}
 			{fileEntries.length === 1 ? 'Note' : 'Notes'}
 		</span>
+
+		<div
+			class:grid={$viewTypeList}
+			class:flex={!$viewTypeList}
+			role="list"
+			aria-label="List of notes"
+			class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 xl:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
+		>
+			{#each fileEntries as entry (entry.id)}
+				<Item {entry} />
+			{/each}
+		</div>
 	{/if}
-	<div
-		class:grid={$viewTypeList}
-		class:flex={!$viewTypeList}
-		role="list"
-		aria-label="List of notes"
-		class="grid-cols-[repeat(auto-fit,minmax(250px,1fr))] flex-col gap-1 xl:grid-cols-[repeat(auto-fit,minmax(450px,1fr))]"
-	>
-		{#each fileEntries as item (item.id)}
-			<Item entry={item} />
-		{/each}
-	</div>
 </div>

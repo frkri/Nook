@@ -5,6 +5,7 @@
 	import { getDirEntryHandle, removeEntries } from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
+	import { recentNotes } from '$lib/store/recentNotes';
 
 	export let entry: EntryData;
 
@@ -29,6 +30,7 @@
 			on:click={async () => {
 				modalDeleteConfirm = false;
 
+				$recentNotes = $recentNotes.filter((note) => note !== entry.id);
 				await removeEntries([entry.id], await getDirEntryHandle(entry.id));
 				await goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
 				invalidate('entries:explorer-loader');

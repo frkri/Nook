@@ -2,17 +2,19 @@
 	import type { EntryDataBasic } from '$lib/types';
 
 	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import { viewTypeList } from '$lib/store/userPreferences';
-	import { ChevronLeft, File, Folder, LayoutGrid, List, Plus } from 'lucide-svelte';
+	import { ChevronLeft, File, Folder, Home, LayoutGrid, List, Plus } from 'lucide-svelte';
+	import { fade } from 'svelte/transition';
 
 	let dropdownOpen = false;
 	let inputOpen = false;
 
 	let pathInput = '';
-	currentPath.subscribe(async (path) => {
+	currentPath.subscribe((path) => {
 		pathInput = path.pathData.map((path) => path.name).join('/');
 	});
 
@@ -100,8 +102,12 @@
 	<div class="group flex h-[40px] w-full gap-2">
 		<!-- Navigation path and back button -->
 		<span
+			transition:fade
 			class="line-clamp-1 flex flex-1 flex-row items-center gap-4 text-ellipsis text-2xl font-bold"
 		>
+			<a href="/" class="button normal" aria-label="Navigate to parent directory">
+				<Home />
+			</a>
 			<a
 				href={'/explorer/' + $currentPath.pathID.slice(0, -1).join('/')}
 				class="button normal"
@@ -110,7 +116,8 @@
 				<ChevronLeft />
 			</a>
 			<input
-				class="flex-1 bg-foreground outline-none dark:bg-background"
+				class="flex-1 overflow-scroll bg-foreground outline-none placeholder:text-accents6 dark:bg-background dark:text-primary dark:placeholder:text-accents2"
+				placeholder="Path"
 				aria-label="Navigation path input field"
 				bind:value={pathInput}
 				on:change={async () => {
@@ -119,8 +126,13 @@
 						pathInput = pathInput.slice(0, -1);
 					}
 					await currentPath.setPathFromName(pathInput.split('/'));
-					await goto('/explorer/' + $currentPath.pathID.join('/'));
-					await invalidate('entries:explorer-loader');
+					// Check if last item in path is a file
+					if ($currentPath?.pathData[$currentPath.pathData.length - 1]?.type === 'file') {
+						await goto('/editor/' + $currentPath.pathID.join('/'));
+					} else {
+						await goto('/explorer/' + $currentPath.pathID.join('/'));
+						await invalidate('entries:explorer-loader');
+					}
 				}}
 				autocorrect="false"
 				type="text"
@@ -128,28 +140,28 @@
 			/>
 		</span>
 
-		<div class="flex gap-1 rounded-lg border border-accents2 p-1" role="radiogroup">
-			<button
-				class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
-				aria-checked={!$viewTypeList}
-				aria-label="Switch to list view"
-				role="radio"
-				on:click={() => viewTypeList.set(false)}
-			>
-				<List class="switch w-6" />
-			</button>
-			<button
-				class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
-				aria-checked={$viewTypeList}
-				aria-label="Switch to grid view"
-				role="radio"
-				on:click={() => viewTypeList.set(true)}
-			>
-				<LayoutGrid class="switch w-6" />
-			</button>
-		</div>
+		{#if $page.url.pathname.startsWith('/explorer')}
+			<div class="hidden gap-1 rounded-lg border border-accents2 p-1 sm:flex" role="radiogroup">
+				<button
+					class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
+					aria-checked={!$viewTypeList}
+					aria-label="Switch to list view"
+					role="radio"
+					on:click={() => viewTypeList.set(false)}
+				>
+					<List class="switch w-6" />
+				</button>
+				<button
+					class="group flex items-center rounded p-1 aria-checked:bg-accents2 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
+					aria-checked={$viewTypeList}
+					aria-label="Switch to grid view"
+					role="radio"
+					on:click={() => viewTypeList.set(true)}
+				>
+					<LayoutGrid class="switch w-6" />
+				</button>
+			</div>
 
-		<div>
 			<button
 				role="menu"
 				aria-label="Create New Entry"
@@ -160,6 +172,6 @@
 				<span class="hidden sm:inline-block">New</span>
 				<Plus />
 			</button>
-		</div>
+		{/if}
 	</div>
 </nav>

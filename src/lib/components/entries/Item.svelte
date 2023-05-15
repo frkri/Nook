@@ -17,7 +17,7 @@
 		let entryHandle = await getFileEntryHandle(entry.id);
 		if (entryHandle) {
 			let file = await entryHandle.getFile();
-			entry.description = (await file.text()).slice(0, 500); // Gets first 100 chars
+			entry.description = (await file.text()).slice(0, 200); // Gets first 200 chars
 		}
 	});
 
