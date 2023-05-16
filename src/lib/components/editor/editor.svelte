@@ -40,6 +40,7 @@
 
 	let entryContent = '';
 	let entryContentHTML = '';
+
 	let bc: BroadcastChannel;
 	onMount(async () => {
 		entryContent = (await readEntryContents(entryHandle)) || '';
@@ -113,7 +114,7 @@
 			<input
 				id="autoSaveDelay"
 				type="number"
-				class="border-main w-20 p-2 font-bold text-primary dark:bg-background"
+				class="border-main w-20 p-2 font-bold dark:bg-background"
 				bind:value={$autoSaveDelay}
 			/>
 		</div>
@@ -145,14 +146,16 @@
 	>
 </ActionModal>
 
-<menu class="z-10 flex w-full justify-between p-2 xl:fixed xl:top-[60px]">
+<menu class="z-10 flex w-full justify-between p-2 lg:fixed lg:top-[60px]">
 	<div class="flex flex-col">
 		<button
 			class="button secondary mb-2 flex justify-between"
 			on:click={() => {
 				modalExportFile = true;
-			}}>Export<Download /></button
+			}}
 		>
+			Export <Download />
+		</button>
 		<div
 			class="flex h-10 justify-between rounded-lg border border-accents4 p-1 dark:aria-checked:bg-accents2"
 			role="radiogroup"

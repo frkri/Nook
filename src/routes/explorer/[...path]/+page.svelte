@@ -8,9 +8,9 @@
 	$: ({ dirEntries, fileEntries } = data);
 </script>
 
-<div class="m-3 pt-6 flex flex-col gap-8">
+<div class="m-3 flex flex-col gap-8 pt-6">
 	{#if dirEntries.length === 0 && fileEntries.length === 0}
-		<div class="mx-auto flex flex-col items-center font-bold gap-4">
+		<div class="mx-auto flex flex-col items-center gap-4 font-bold">
 			<p>No entries found! Create new items using the</p>
 			<Plus size={35} class="button" />
 		</div>
@@ -37,8 +37,8 @@
 	{/if}
 
 	{#if fileEntries.length > 0}
-		<span class="mx-auto text-2xl font-bold dark:text-primary"
-			>{fileEntries.length}
+		<span class="mx-auto text-2xl font-bold dark:text-primary">
+			{fileEntries.length}
 			{fileEntries.length === 1 ? 'Note' : 'Notes'}
 		</span>
 

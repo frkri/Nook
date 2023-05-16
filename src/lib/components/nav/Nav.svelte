@@ -8,7 +8,6 @@
 	import { currentPath } from '$lib/store/currentPath';
 	import { viewTypeList } from '$lib/store/userPreferences';
 	import { ChevronLeft, File, Folder, Home, LayoutGrid, List, Plus } from 'lucide-svelte';
-	import { fade } from 'svelte/transition';
 
 	let dropdownOpen = false;
 	let inputOpen = false;
@@ -102,7 +101,6 @@
 	<div class="group flex h-[40px] w-full gap-2">
 		<!-- Navigation path and back button -->
 		<span
-			transition:fade
 			class="line-clamp-1 flex flex-1 flex-row items-center gap-4 text-ellipsis text-2xl font-bold"
 		>
 			<a href="/" class="button normal" aria-label="Navigate to parent directory">
@@ -119,6 +117,9 @@
 				class="flex-1 overflow-scroll bg-foreground outline-none placeholder:text-accents6 dark:bg-background dark:text-primary dark:placeholder:text-accents2"
 				placeholder="Path"
 				aria-label="Navigation path input field"
+				autocorrect="false"
+				type="text"
+				name="path"
 				bind:value={pathInput}
 				on:change={async () => {
 					// Remove trailing slash
@@ -134,9 +135,6 @@
 						await invalidate('entries:explorer-loader');
 					}
 				}}
-				autocorrect="false"
-				type="text"
-				name="path"
 			/>
 		</span>
 
