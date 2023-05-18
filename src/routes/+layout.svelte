@@ -4,6 +4,8 @@
 	import { currentPath } from '$lib/store/currentPath';
 	import { onMount } from 'svelte';
 
+	// Import global styles
+	import '$lib/assets/fonts.css';
 	import '../app.css';
 
 	// Sets the current path from page params
