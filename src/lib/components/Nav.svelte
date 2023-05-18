@@ -134,7 +134,7 @@
 			<input
 				class="flex-1 overflow-scroll bg-foreground outline-none placeholder:text-accents6 dark:bg-background dark:text-primary dark:placeholder:text-accents2"
 				id="path-input"
-				placeholder="Use / to focus"
+				placeholder="Type / to focus"
 				aria-label="Navigation path input field"
 				autocorrect="false"
 				type="text"

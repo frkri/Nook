@@ -37,7 +37,7 @@
 	<Portal target="#portal">
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
-			class="fixed left-0 top-0 z-10 flex h-screen w-screen items-end justify-center bg-background bg-opacity-40 p-5"
+			class="fixed left-0 top-0 z-10 flex h-screen w-screen items-end justify-center bg-background bg-opacity-40"
 			transition:fade={{ duration: 60 }}
 			on:click={(e) => {
 				if (e.target === e.currentTarget) {
@@ -46,7 +46,7 @@
 			}}
 		>
 			<div
-				class="border-main flex h-60 w-full max-w-5xl flex-col justify-around bg-foreground p-3 dark:bg-background"
+				class="border-main mb-12 flex h-72 w-full max-w-5xl flex-col justify-around bg-foreground p-3 dark:bg-background"
 				use:useNode
 				in:scale={{ duration: 60, start: 0.95 }}
 			>

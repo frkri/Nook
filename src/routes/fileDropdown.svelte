@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { AwardIcon, File } from 'lucide-svelte';
-	import { onDestroy, onMount } from 'svelte';
+	import { File } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	// Import global styles
 	import { invalidate } from '$app/navigation';
