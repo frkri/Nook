@@ -1,14 +1,22 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
+	import tips from '$lib/assets/tips.json';
 	import Item from '$lib/components/Item.svelte';
 	import { viewTypeList } from '$lib/store/userPreferences.js';
-	import { Plus } from 'lucide-svelte';
+	import { Lightbulb, Plus } from 'lucide-svelte';
 
 	export let data;
 
 	$: ({ dirEntries, fileEntries } = data);
+
+	let randomTip = '';
+	afterNavigate(() => {
+		// Get a random tip from the tips.json file
+		randomTip = tips[Math.floor(Math.random() * tips.length)];
+	});
 </script>
 
-<div class="m-3 flex flex-col gap-8 pt-6">
+<div class="m-3 flex flex-col gap-8 pt-6 min-h-[80vh]">
 	{#if dirEntries.length === 0 && fileEntries.length === 0}
 		<div class="mx-auto flex flex-col items-center gap-4 font-bold">
 			<p>No entries found! Create new items using the</p>
@@ -55,3 +63,11 @@
 		</div>
 	{/if}
 </div>
+
+<footer class="flex w-full items-center justify-center gap-2 p-8">
+	<span class="flex gap-2 font-bold tracking-wider">
+		<Lightbulb />
+		Tip:
+	</span>
+	{randomTip}
+</footer>
