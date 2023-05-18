@@ -3,8 +3,9 @@
 	import Nav from '$lib/components/Nav.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import { onMount } from 'svelte';
+	import FileDropdown from './fileDropdown.svelte';
 
-	// Import global styles
+	// Import styles
 	import '$lib/assets/fonts.css';
 	import '../app.css';
 
@@ -35,3 +36,5 @@
 <main class="mt-[65px]">
 	<slot />
 </main>
+
+<FileDropdown />

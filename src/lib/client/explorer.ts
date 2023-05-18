@@ -134,7 +134,8 @@ export async function resolveEntriesByName(path: string[]): Promise<EntryData[]>
  */
 export async function createEntries(
 	newEntries: EntryDataBasic[],
-	currentDirHandle?: FileSystemDirectoryHandle
+	currentDirHandle?: FileSystemDirectoryHandle,
+	contents?: string[]
 ) {
 	// Get root directory handle if not provided
 	if (!currentDirHandle) currentDirHandle = await navigator.storage.getDirectory();
@@ -165,7 +166,13 @@ export async function createEntries(
 			const handle = await currentDirHandle.getDirectoryHandle(entry.id, { create: true });
 			handleCache.set(entry.id, handle);
 		} else if (entry.type === 'file') {
-			await currentDirHandle.getFileHandle(entry.id, { create: true });
+			const fileHandle = await currentDirHandle.getFileHandle(entry.id, { create: true });
+
+			if (contents === undefined) return;
+
+			const fileWriter = await fileHandle.createWritable();
+			await fileWriter.write(contents[newEntries.indexOf(newEntry)]);
+			await fileWriter.close();
 		}
 	}
 
