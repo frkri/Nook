@@ -37,6 +37,10 @@ export const load = (async ({ params, depends }) => {
 		(entry) => entry?.type === 'file' && entry !== null
 	) as EntryData[];
 
+	// Sort entries by name
+	dirEntries.sort((a, b) => a.name.localeCompare(b.name));
+	fileEntries.sort((a, b) => a.name.localeCompare(b.name));
+
 	return {
 		dirEntries,
 		fileEntries
