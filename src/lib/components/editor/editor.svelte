@@ -43,7 +43,7 @@
 
 	let bc: BroadcastChannel;
 	onMount(async () => {
-		entryContent = (await readEntryContents(entryHandle)) || '';
+		entryContent = await readEntryContents(entryHandle);
 		entryContentHTML = snarkdown(entryContent);
 		bc = new BroadcastChannel(`editor:${entry.id}`);
 
@@ -73,6 +73,7 @@
 			if ($autoBroadcastState)
 				bc.postMessage({ type: broadcastMessage.SaveFile, content: entryContent });
 
+			// Inform the user that the file has been saved
 			recentlySaved = true;
 			setTimeout(() => {
 				recentlySaved = false;
@@ -263,7 +264,7 @@
 	</div>
 </menu>
 
-<div class="flex items-center justify-center px-2 dark:bg-background xl:mt-[180px]">
+<div class="flex items-center justify-center px-2 dark:bg-background lg:mt-[180px]">
 	{#if $viewTypeEditor}
 		<div class="prose px-2 dark:prose-invert xl:prose-xl">
 			{@html entryContentHTML}
