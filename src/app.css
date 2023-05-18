@@ -6,6 +6,8 @@
 	html,
 	body {
 		@apply mx-auto dark:bg-background dark:text-foreground;
+
+		font-family: 'Inter', 'Inter-fallback';
 	}
 }
 

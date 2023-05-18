@@ -38,6 +38,7 @@
 	<header class="flex items-center gap-2 py-2">
 		<button
 			class="group-focus-within:inline-block group-hover:inline-block"
+			aria-label="Delete entry"
 			on:click={() => {
 				modalDeleteConfirm = true;
 			}}
