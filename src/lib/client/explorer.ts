@@ -1,8 +1,8 @@
 // Using @types/wicg-file-system-access for FileSystem API types support
-import type { EntryData, EntryDataBasic } from '$lib/types';
+import type { EntryData, EntryDataBasic, Export } from '$lib/types';
 
 import { db } from '$lib/client/db';
-import { getMapEntryByName, walkDirectory } from '../client/utils';
+import { getMapEntryByName, iterToArray, walkDirectory } from '../client/utils';
 
 /**
  * Key-Value cache for entries
@@ -211,6 +211,7 @@ export async function getFileEntryHandle(
 
 	// Find parent directory of file
 	const dirHandle = await walkDirectory(currentDirHandle, id);
+	if (!dirHandle) return undefined;
 	const fileHandle = await dirHandle?.getFileHandle(id);
 
 	return fileHandle;
@@ -227,7 +228,12 @@ export async function writeEntryContents(
 	content: string
 ): Promise<void> {
 	const writable = await fileHandle.createWritable();
+
+	// Remove all content from file
+	writable.truncate(0);
+	// Write new content to file
 	await writable.write(content);
+
 	await writable.close();
 
 	console.debug('Saved file: ' + fileHandle.name);
@@ -261,6 +267,89 @@ export async function removeEntries(
 		if (handle) {
 			await handle.removeEntry(id, { recursive: true });
 			handleCache.delete(id);
+		}
+	}
+}
+
+/**
+ * Recursively exports an entry with its contents into a JSON object
+ */
+export async function exportEntry(parentHandle: FileSystemDirectoryHandle) {
+	// Retrive info about parent, if root set id and name to root
+	let parent: EntryData;
+
+	if (parentHandle.name === '' || parentHandle.name === 'root') {
+		parent = {
+			id: 'root',
+			name: 'root',
+			icon: '',
+			type: 'directory',
+			created: Date.now(),
+			modified: Date.now(),
+			description: ''
+		};
+	} else {
+		const parentData = (await getEntriesByID([parentHandle.name]))[0];
+		if (parentData === null) throw new Error('Parent entry not found');
+
+		parent = parentData;
+	}
+
+	// Retrive info about children entries of parent
+	const entriesIDs = await iterToArray(parentHandle.keys());
+	const entries = (await getEntriesByID(entriesIDs)).filter((e) => e !== null) as EntryData[];
+
+	const exportData: Export = {
+		...parent,
+		children: []
+	};
+
+	if (exportData.children === undefined) return exportData;
+
+	for await (const entry of entries) {
+		if (entry.type === 'file') {
+			exportData.children.push({
+				...entry,
+				content: await readEntryContents(await parentHandle.getFileHandle(entry.id))
+			});
+		} else if (entry.type === 'directory') {
+			const childData = await exportEntry(await parentHandle.getDirectoryHandle(entry.id));
+			exportData.children.push(childData);
+		}
+	}
+
+	return exportData;
+}
+/**
+ * Recursively imports an entry with its contents into storage
+ */
+export async function importEntry(entries: Export, parentHandle?: FileSystemDirectoryHandle) {
+	if (entries.id === 'root') {
+		// Set new parentHandle to the parent directory of this entry
+		parentHandle = await navigator.storage.getDirectory();
+	} else {
+		// Create the parent directory in the given parentHandle
+		await createEntries([entries], parentHandle);
+		// Set new parentHandle to the parent directory of newly created entry
+		parentHandle = await getDirEntryHandle(entries.id, parentHandle);
+	}
+
+	if (entries.children === undefined) return;
+
+	for await (const entry of entries.children) {
+		console.log('Importing entry', entry, 'into', parentHandle);
+		if (entry.type === 'directory') {
+			// Will create the parent directory and then the children of that element
+			importEntry(entry, parentHandle);
+		} else {
+			await createEntries([entry], parentHandle);
+			const entryHandle = await getFileEntryHandle(entry.id, parentHandle);
+
+			if (entryHandle === undefined) throw new Error('Failed to get file handle of entry');
+
+			// Write to file if content is defined
+			if (entry.content === undefined) return;
+			await writeEntryContents(entryHandle, entry.content);
 		}
 	}
 }
