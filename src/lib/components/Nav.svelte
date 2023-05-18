@@ -29,6 +29,8 @@
 
 		if (e.key === '/') {
 			e.preventDefault();
+			inputOpen = false;
+			dropdownOpen = false;
 			document.getElementById('path-input')?.focus();
 		}
 	}

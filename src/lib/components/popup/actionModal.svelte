@@ -1,13 +1,12 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import Portal from 'svelte-portal';
 	import { fade, scale } from 'svelte/transition';
 
 	export let open = false;
 	export let title = '';
 
-	$: if (open) {
-		document.addEventListener('keydown', handleKeyDown, true);
-	} else {
+	$: if (!open) {
 		document.removeEventListener('keydown', handleKeyDown, true);
 	}
 
@@ -15,6 +14,22 @@
 		if (e.key === 'Escape') {
 			open = false;
 		}
+	}
+
+	let node: HTMLElement;
+
+	function useNode(node: HTMLElement) {
+		document.addEventListener('keydown', handleKeyDown, true);
+
+		// Wait for the DOM to update
+		tick().then(() => {
+			var firstInputElement = node.querySelector<HTMLElement>(
+				'input:first-child, button:first-child'
+			);
+
+			// Focus the first input or button
+			if (firstInputElement) firstInputElement?.focus();
+		});
 	}
 </script>
 
@@ -32,6 +47,7 @@
 		>
 			<div
 				class="border-main flex h-60 w-full max-w-5xl flex-col justify-around bg-foreground p-3 dark:bg-background"
+				use:useNode
 				in:scale={{ duration: 60, start: 0.95 }}
 			>
 				{#if title}
