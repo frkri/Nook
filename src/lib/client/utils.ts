@@ -81,3 +81,13 @@ export async function downloadFile(name: string, extension: string, type: string
 	URL.revokeObjectURL(url);
 	link.remove();
 }
+
+/**
+ * Fetch a remote file and return its content as a string
+ * @param url of remote resource
+ * @returns string content of the file
+ */
+export async function fetchRemoteFile(url: URL) {
+	const response = await fetch(url);
+	return await response.text();
+}

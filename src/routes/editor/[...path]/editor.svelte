@@ -4,6 +4,7 @@
 	import { readEntryContents, writeEntryContents } from '$lib/client/explorer';
 	import { downloadFile } from '$lib/client/utils';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
+	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import {
 		autoBroadcastState,
@@ -27,7 +28,6 @@
 	} from 'lucide-svelte';
 	import snarkdown from 'snarkdown';
 	import { onDestroy, onMount } from 'svelte';
-	import DeleteEntryModal from '../popup/deleteEntryModal.svelte';
 
 	export let entry: EntryData;
 	export let entryHandle: FileSystemFileHandle;
@@ -40,9 +40,10 @@
 
 	let entryContent = '';
 	let entryContentHTML = '';
+
 	let bc: BroadcastChannel;
 	onMount(async () => {
-		entryContent = (await readEntryContents(entryHandle)) || '';
+		entryContent = await readEntryContents(entryHandle);
 		entryContentHTML = snarkdown(entryContent);
 		bc = new BroadcastChannel(`editor:${entry.id}`);
 
@@ -72,6 +73,7 @@
 			if ($autoBroadcastState)
 				bc.postMessage({ type: broadcastMessage.SaveFile, content: entryContent });
 
+			// Inform the user that the file has been saved
 			recentlySaved = true;
 			setTimeout(() => {
 				recentlySaved = false;
@@ -113,7 +115,7 @@
 			<input
 				id="autoSaveDelay"
 				type="number"
-				class="border-main w-20 p-2 font-bold text-primary dark:bg-background"
+				class="border-main w-20 p-2 font-bold dark:bg-background"
 				bind:value={$autoSaveDelay}
 			/>
 		</div>
@@ -128,7 +130,7 @@
 		id="folder"
 		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
 		on:click={() => {
-			downloadFile(entry.name, 'md', 'text/plain', entryContent);
+			downloadFile(entry.name, 'md', 'text/markdown', entryContent);
 			modalExportFile = false;
 		}}><FileText class="w-4" />Markdown</button
 	>
@@ -145,14 +147,16 @@
 	>
 </ActionModal>
 
-<menu class="z-10 flex w-full justify-between p-2 xl:fixed xl:top-[60px]">
+<menu class="z-10 flex w-full justify-between p-2 lg:fixed lg:top-[60px]">
 	<div class="flex flex-col">
 		<button
 			class="button secondary mb-2 flex justify-between"
 			on:click={() => {
 				modalExportFile = true;
-			}}>Export<Download /></button
+			}}
 		>
+			Export <Download />
+		</button>
 		<div
 			class="flex h-10 justify-between rounded-lg border border-accents4 p-1 dark:aria-checked:bg-accents2"
 			role="radiogroup"
@@ -260,7 +264,7 @@
 	</div>
 </menu>
 
-<div class="flex items-center justify-center px-2 dark:bg-background xl:mt-[180px]">
+<div class="flex items-center justify-center px-2 dark:bg-background lg:mt-[180px]">
 	{#if $viewTypeEditor}
 		<div class="prose px-2 dark:prose-invert xl:prose-xl">
 			{@html entryContentHTML}

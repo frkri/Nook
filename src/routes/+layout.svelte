@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Nav from '$lib/components/nav/Nav.svelte';
+	import Nav from '$lib/components/Nav.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import { onMount } from 'svelte';
 
@@ -9,7 +9,7 @@
 	// Sets the current path from page params
 	$: currentPath.setPathFromID($page.params.path?.split('/') ?? ['root']);
 
-	// Ask for permanent storage permission if not granted
+	// Ask for permanent storage permission if not already granted
 	onMount(() => {
 		navigator.storage.persisted().then((persisted) => {
 			if (!persisted) {

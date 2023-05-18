@@ -21,3 +21,8 @@ export type EntryType = (typeof entryType)[keyof typeof entryType];
 export const broadcastMessage = {
 	SaveFile: 'save-file'
 } as const;
+
+export interface Export extends EntryData {
+	content?: string;
+	children?: Export[];
+}
