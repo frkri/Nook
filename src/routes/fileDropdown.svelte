@@ -31,29 +31,41 @@
 		let dirHandle = getDirEntryHandle($currentPath.currentEntryID);
 
 		let entriesData: string[] = [];
-
 		let entries: EntryDataBasic[] = [];
 		for await (const file of files) {
-			// Get the file name without the extension
-			const dotIndex = file.name.lastIndexOf('.');
-			console.log(dotIndex);
-			const newFilename = file.name.substring(0, dotIndex === -1 ? file.name.length : dotIndex);
+			if (!file.name) continue;
 
-			entries.push({
-				name: newFilename,
-				icon: '📝',
-				type: 'file'
-			});
+			try {
+				// Get the file name without the extension else use the full name
+				const dotIndex = file.name.lastIndexOf('.');
+				const newFilename = file.name.substring(0, dotIndex === -1 ? file.name.length : dotIndex);
 
-			entriesData.push(await file.text());
+				entries.push({
+					name: newFilename,
+					icon: '📝',
+					type: 'file'
+				});
+
+				entriesData.push(await file.text());
+			} catch (error) {
+				continue;
+			}
 		}
 		await createEntries(entries, await dirHandle, entriesData);
 
 		invalidate('entries:explorer-loader');
 	}
 
-	function handleDragEnter() {
-		shouldShowDropZone = true;
+	function handleDragEnter(e: DragEvent) {
+		if (!e.dataTransfer) return;
+
+		// Check if any of the dragged items are a file
+		for (const item of e.dataTransfer.items) {
+			if (item.kind === 'file') {
+				shouldShowDropZone = true;
+				return;
+			}
+		}
 	}
 </script>
 
