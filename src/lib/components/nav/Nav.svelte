@@ -51,7 +51,7 @@
 		<button
 			class="button normal"
 			on:click={async () => {
-				if (newEntry.name.length === 0) return;
+				if (newEntry.name.length === 0 || newEntry.icon.length === 0) return;
 				inputOpen = false;
 				await createEntries([newEntry], await getDirEntryHandle($currentPath.currentEntryID));
 				await invalidate('entries:explorer-loader');
