@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Editor from '$lib/components/editor/editor.svelte';
 	import { recentNotes } from '$lib/store/recentNotes.js';
 	import { onMount } from 'svelte';
+	import Editor from './editor.svelte';
 
 	export let data;
 

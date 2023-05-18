@@ -4,6 +4,7 @@
 	import { readEntryContents, writeEntryContents } from '$lib/client/explorer';
 	import { downloadFile } from '$lib/client/utils';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
+	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import {
 		autoBroadcastState,
@@ -27,7 +28,6 @@
 	} from 'lucide-svelte';
 	import snarkdown from 'snarkdown';
 	import { onDestroy, onMount } from 'svelte';
-	import DeleteEntryModal from '../popup/deleteEntryModal.svelte';
 
 	export let entry: EntryData;
 	export let entryHandle: FileSystemFileHandle;
@@ -130,7 +130,7 @@
 		id="folder"
 		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
 		on:click={() => {
-			downloadFile(entry.name, 'md', 'text/plain', entryContent);
+			downloadFile(entry.name, 'md', 'text/markdown', entryContent);
 			modalExportFile = false;
 		}}><FileText class="w-4" />Markdown</button
 	>

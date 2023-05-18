@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Item from '$lib/components/entries/Item.svelte';
+	import Item from '$lib/components/Item.svelte';
 	import { viewTypeList } from '$lib/store/userPreferences.js';
 	import { Plus } from 'lucide-svelte';
 
