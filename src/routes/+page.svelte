@@ -37,22 +37,27 @@
 <ImportModal open={importModalOpen} openUrl={importModalUrlOpen} {importUrl} {dirHandle} />
 
 <div class="m-4">
-	<div class="flex min-h-screen flex-col items-center justify-center gap-10">
+	<div class="grid min-h-screen flex-col items-center justify-center gap-10">
 		<div class="flex flex-col items-center gap-4">
-			<h1 class="text-4xl font-bold">Welcome to Nook.</h1>
-			<p class="text-lg">
-				Nook is a simple offline note-taking app that allows you to create, edit, and delete notes.
+			<h1 class="text-4xl font-black tracking-wider">
+				Welcome to <span
+					class="bg-gradient-to-r from-[#1e8b6e] to-[#0c8699] bg-clip-text text-transparent"
+				>
+					Nook.
+				</span>
+			</h1>
+			<p class="text-lg text-center">
+				Nook is a lightweight and simple note-taking app that supports offline usage and Markdown
 			</p>
+			<a href="/explorer" class="button normal flex items-center justify-center p-6">
+				Open Explorer <ArrowRight />
+			</a>
 		</div>
-
-		<a href="/explorer" class="button normal flex items-center justify-center p-6">
-			Open Explorer <ArrowRight />
-		</a>
 
 		<div class="flex flex-col items-center justify-center">
 			{#if recent.length > 0}
 				<label for="recent-notes" class="mb-2 text-lg font-bold">Recent Notes</label>
-				<div id="recent-notes" class="flex w-96 max-w-md flex-col gap-2">
+				<div id="recent-notes" class="flex w-full max-w-md flex-col gap-2">
 					{#each recent as entry (entry.id)}
 						<Item {entry} />
 					{/each}
