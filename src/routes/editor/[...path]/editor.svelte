@@ -10,6 +10,7 @@
 		autoBroadcastState,
 		autoSaveDelay,
 		autoSaveEditor,
+		hotkeysEnabled,
 		viewTypeEditor
 	} from '$lib/store/userPreferences';
 	import {
@@ -41,6 +42,9 @@
 	let entryContent = '';
 	let entryContentHTML = '';
 
+	$: if ($hotkeysEnabled) document.addEventListener('keydown', handleKeyDown, true);
+	$: if (!$hotkeysEnabled) document.removeEventListener('keydown', handleKeyDown, true);
+
 	let bc: BroadcastChannel;
 	onMount(async () => {
 		entryContent = await readEntryContents(entryHandle);
@@ -58,7 +62,28 @@
 	});
 	onDestroy(() => {
 		bc.close();
+		document.removeEventListener('keydown', handleKeyDown, true);
 	});
+
+	// Hotkeys state checks
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.ctrlKey || e.metaKey)
+			switch (e.key) {
+				case 's':
+					e.preventDefault();
+					recentlySaved = true;
+					handleSave();
+					break;
+				case 'e':
+					e.preventDefault();
+					modalExportFile = !modalExportFile;
+					break;
+				case 'q':
+					e.preventDefault();
+					$viewTypeEditor = !$viewTypeEditor;
+					break;
+			}
+	}
 
 	let recentlySaved = false;
 	// Tries to save after a delay if no other saves are triggered in the meantime
@@ -118,6 +143,19 @@
 				class="border-main w-20 p-2 font-bold dark:bg-background"
 				bind:value={$autoSaveDelay}
 			/>
+		</div>
+
+		<div class="flex items-center justify-between">
+			<label for="hotkeysEnabled">Enable hotkeys</label>
+			<button
+				class="button normal flex w-20 items-center justify-center"
+				id="hotkeysEnabled"
+				on:click={() => {
+					$hotkeysEnabled = !$hotkeysEnabled;
+				}}
+			>
+				{$hotkeysEnabled ? 'On' : 'Off'}
+			</button>
 		</div>
 	</div>
 </ActionModal>

@@ -8,6 +8,7 @@
 	import { currentPath } from '$lib/store/currentPath';
 	import { viewTypeList } from '$lib/store/userPreferences';
 	import { ChevronLeft, File, Folder, Home, LayoutGrid, List, Plus } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	let dropdownOpen = false;
 	let inputOpen = false;
@@ -16,6 +17,21 @@
 	currentPath.subscribe((path) => {
 		pathInput = path.pathData.map((path) => path.name).join('/');
 	});
+
+	onMount(() => {
+		document.addEventListener('keydown', handleKeyDown, true);
+		return () => document.removeEventListener('keydown', handleKeyDown, true);
+	});
+
+	function handleKeyDown(e: KeyboardEvent) {
+		// Ignore if the user is typing in an input
+		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+		if (e.key === '/') {
+			e.preventDefault();
+			document.getElementById('path-input')?.focus();
+		}
+	}
 
 	let newEntry: EntryDataBasic = {
 		type: 'file',
@@ -115,7 +131,8 @@
 			</a>
 			<input
 				class="flex-1 overflow-scroll bg-foreground outline-none placeholder:text-accents6 dark:bg-background dark:text-primary dark:placeholder:text-accents2"
-				placeholder="Path"
+				id="path-input"
+				placeholder="Use / to focus"
 				aria-label="Navigation path input field"
 				autocorrect="false"
 				type="text"

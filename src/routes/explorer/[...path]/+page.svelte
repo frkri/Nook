@@ -16,7 +16,7 @@
 	});
 </script>
 
-<div class="m-3 flex flex-col gap-8 pt-6 min-h-[80vh]">
+<div class="m-3 flex min-h-[80vh] flex-col gap-8 pt-6">
 	{#if dirEntries.length === 0 && fileEntries.length === 0}
 		<div class="mx-auto flex flex-col items-center gap-4 font-bold">
 			<p>No entries found! Create new items using the</p>
