@@ -4,7 +4,6 @@
 	import { exportEntry, getEntriesByID } from '$lib/client/explorer';
 	import { downloadFile } from '$lib/client/utils';
 	import Item from '$lib/components/Item.svelte';
-	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
 	import ImportModal from '$lib/components/popup/importModal.svelte';
 	import { recentNotes } from '$lib/store/recentNotes';
 	import { ArrowRight, Download, Trash, Upload } from 'lucide-svelte';
