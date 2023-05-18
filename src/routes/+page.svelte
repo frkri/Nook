@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { EntryData } from '$lib/types';
 
+	import { page } from '$app/stores';
 	import { exportEntry, getEntriesByID } from '$lib/client/explorer';
 	import { downloadFile } from '$lib/client/utils';
 	import Item from '$lib/components/Item.svelte';
@@ -12,12 +13,19 @@
 	let recent = [] as EntryData[];
 	let dirHandle: FileSystemDirectoryHandle;
 
+	let importModalOpen = false;
+	let importModalUrlOpen = false;
+	let importUrl = '';
+
 	onMount(async () => {
 		recent = (await getEntriesByID($recentNotes)) as EntryData[];
 		dirHandle = await navigator.storage.getDirectory();
-	});
 
-	let importModalOpen = false;
+		importUrl = $page.url.searchParams.get('importURL') || '';
+		if (importUrl.length > 0) {
+			importModalUrlOpen = true;
+		}
+	});
 
 	async function exportRoot() {
 		let root = await navigator.storage.getDirectory();
@@ -26,7 +34,7 @@
 	}
 </script>
 
-<ImportModal open={importModalOpen} {dirHandle} />
+<ImportModal open={importModalOpen} openUrl={importModalUrlOpen} {importUrl} {dirHandle} />
 
 <div class="m-4">
 	<div class="flex min-h-screen flex-col items-center justify-center gap-10">

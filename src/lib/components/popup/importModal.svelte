@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { importEntry } from '$lib/client/explorer';
 	import { fetchRemoteFile } from '$lib/client/utils';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
@@ -8,9 +8,9 @@
 	export let open = false;
 	export let dirHandle: FileSystemDirectoryHandle;
 
-	let importModalUrlOpen = false;
+	export let openUrl = false;
 
-	let importUrl = '';
+	export let importUrl = '';
 	let files: FileList | null = null;
 
 	async function importRoot(content: string) {
@@ -27,7 +27,7 @@
 			class="button secondary"
 			on:click={() => {
 				open = false;
-				importModalUrlOpen = true;
+				openUrl = true;
 			}}
 		>
 			<Link />Remote
@@ -52,7 +52,7 @@
 	</div>
 </ActionModal>
 
-<ActionModal open={importModalUrlOpen}>
+<ActionModal open={openUrl} title="URL to import">
 	<div class="flex justify-around gap-2 sm:m-3">
 		<input
 			bind:value={importUrl}
@@ -64,7 +64,7 @@
 		<button
 			class="button secondary"
 			on:click={() => {
-				importModalUrlOpen = false;
+				openUrl = false;
 			}}
 		>
 			Cancel
@@ -77,8 +77,12 @@
 				const result = await fetchRemoteFile(new URL(importUrl));
 				if (!result) return;
 
-				importModalUrlOpen = false;
+				openUrl = false;
 				importRoot(result);
+				importUrl = '';
+
+				// Reset to home
+				goto('/');
 			}}
 		>
 			Import
