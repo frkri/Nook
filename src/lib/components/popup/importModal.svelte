@@ -70,7 +70,7 @@
 			Cancel
 		</button>
 		<button
-			class="button normal"
+			class="button main"
 			on:click={async () => {
 				if (importUrl.length === 0) return;
 

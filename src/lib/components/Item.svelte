@@ -59,7 +59,7 @@
 	{#if entry.description}
 		<p
 			class="relative mx-8 line-clamp-2 overflow-hidden text-sm text-secondary
-				after:absolute after:bottom-0 after:right-0 after:h-[1.25rem] after:w-[40ch] after:bg-gradient-to-r after:from-transparent after:to-foreground dark:after:to-background"
+				after:absolute after:bottom-0 after:right-0 after:h-[1.25rem] after:w-[30ch] after:bg-gradient-to-r after:from-transparent after:to-foreground dark:after:to-background"
 		>
 			{entry.description}
 		</p>

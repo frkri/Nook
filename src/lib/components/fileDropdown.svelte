@@ -2,14 +2,11 @@
 	import { File } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
-	// Import global styles
 	import { invalidate } from '$app/navigation';
-	import '$lib/assets/fonts.css';
 	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
 	import { currentPath } from '$lib/store/currentPath';
 	import type { EntryDataBasic } from '$lib/types';
 	import { fade } from 'svelte/transition';
-	import '../app.css';
 
 	let shouldShowDropZone = false;
 
@@ -59,7 +56,7 @@
 	function handleDragEnter(e: DragEvent) {
 		if (!e.dataTransfer) return;
 
-		// Check if any of the dragged items are a file
+		// Check if any of the dragged items are kind of file
 		for (const item of e.dataTransfer.items) {
 			if (item.kind === 'file') {
 				shouldShowDropZone = true;
@@ -72,7 +69,7 @@
 {#if shouldShowDropZone}
 	<div
 		id="drop-zone"
-		class="absolute left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center gap-10 bg-background bg-opacity-70"
+		class="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center gap-10 bg-background bg-opacity-70"
 		transition:fade={{ duration: 80 }}
 		on:dragover={(e) => {
 			e.preventDefault();

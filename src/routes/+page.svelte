@@ -7,7 +7,7 @@
 	import Item from '$lib/components/Item.svelte';
 	import ImportModal from '$lib/components/popup/importModal.svelte';
 	import { recentNotes } from '$lib/store/recentNotes';
-	import { ArrowRight, Download, Trash, Upload } from 'lucide-svelte';
+	import { ArrowRight, Download, Upload } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
 	let recent = [] as EntryData[];
@@ -49,7 +49,7 @@
 			<p class="text-center text-lg">
 				Nook is a lightweight and simple note-taking app that supports offline usage and Markdown
 			</p>
-			<a href="/explorer" class="button normal flex items-center justify-center p-6">
+			<a href="/explorer" class="button main flex items-center justify-center p-6">
 				Open Explorer <ArrowRight />
 			</a>
 		</div>
@@ -68,7 +68,7 @@
 
 	<div class="mx-auto mt-14 grid h-48 w-full max-w-md grid-cols-2">
 		<button
-			class="normal flex cursor-pointer flex-col items-center justify-center rounded-l-lg border p-4 transition"
+			class="main flex cursor-pointer flex-col items-center justify-center rounded-l-lg border p-4 transition"
 			on:click={() => (importModalOpen = true)}
 		>
 			<Download size={40} />
@@ -76,7 +76,7 @@
 		</button>
 
 		<button
-			class="normal flex flex-col items-center justify-center rounded-r-lg border p-4 transition"
+			class="main flex flex-col items-center justify-center rounded-r-lg border p-4 transition"
 			on:click={exportRoot}
 		>
 			<Upload size={40} />

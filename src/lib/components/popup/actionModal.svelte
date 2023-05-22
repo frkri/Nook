@@ -16,8 +16,6 @@
 		}
 	}
 
-	let node: HTMLElement;
-
 	function useNode(node: HTMLElement) {
 		document.addEventListener('keydown', handleKeyDown, true);
 
@@ -46,7 +44,7 @@
 			}}
 		>
 			<div
-				class="border-main mb-12 flex h-72 w-full max-w-5xl flex-col justify-around bg-foreground p-3 dark:bg-background"
+				class="border-main mx-2 mb-12 flex h-72 w-full max-w-5xl flex-col justify-around bg-foreground p-3 dark:bg-background"
 				use:useNode
 				in:scale={{ duration: 60, start: 0.95 }}
 			>

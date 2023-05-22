@@ -43,7 +43,7 @@
 	let entryContentHTML = '';
 
 	$: if ($hotkeysEnabled) document.addEventListener('keydown', handleKeyDown, true);
-	$: if (!$hotkeysEnabled) document.removeEventListener('keydown', handleKeyDown, true);
+	else document.removeEventListener('keydown', handleKeyDown, true);
 
 	let bc: BroadcastChannel;
 	onMount(async () => {
@@ -68,9 +68,10 @@
 	// Hotkeys state checks
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.ctrlKey || e.metaKey)
-			switch (e.key) {
+			switch (e.key.toLocaleLowerCase()) {
 				case 's':
 					e.preventDefault();
+					// Inform the user that the file has been saved
 					recentlySaved = true;
 					handleSave();
 					break;
@@ -81,6 +82,7 @@
 				case 'q':
 					e.preventDefault();
 					$viewTypeEditor = !$viewTypeEditor;
+					entryContentHTML = snarkdown(entryContent);
 					break;
 			}
 	}
@@ -114,7 +116,7 @@
 		<div class="flex items-center justify-between">
 			<label for="autoSaveToggle">Autosave</label>
 			<button
-				class="button normal flex w-20 items-center justify-center"
+				class="button main flex w-20 items-center justify-center"
 				id="autoSaveToggle"
 				on:click={() => {
 					$autoSaveEditor = !$autoSaveEditor;
@@ -126,7 +128,7 @@
 		<div class="flex items-center justify-between">
 			<label for="autoBroadcastState">Broadcast file updates</label>
 			<button
-				class="button normal flex w-20 items-center justify-center"
+				class="button main flex w-20 items-center justify-center"
 				id="autoBroadcastState"
 				on:click={() => {
 					$autoBroadcastState = !$autoBroadcastState;
@@ -148,7 +150,7 @@
 		<div class="flex items-center justify-between">
 			<label for="hotkeysEnabled">Enable hotkeys</label>
 			<button
-				class="button normal flex w-20 items-center justify-center"
+				class="button main flex w-20 items-center justify-center"
 				id="hotkeysEnabled"
 				on:click={() => {
 					$hotkeysEnabled = !$hotkeysEnabled;
@@ -165,7 +167,6 @@
 	<button
 		role="menuitem"
 		aria-label="Export as Markdown file"
-		id="folder"
 		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
 		on:click={() => {
 			downloadFile(entry.name, 'md', 'text/markdown', entryContent);
@@ -175,7 +176,6 @@
 	<button
 		role="menuitem"
 		aria-label="Export as HTML file"
-		id="note"
 		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
 		on:click={() => {
 			entryContentHTML = snarkdown(entryContent);
@@ -264,7 +264,7 @@
 			</button>
 		</div>
 		<div class="mt-2 flex gap-2">
-			<div class="button normal flex flex-1 justify-between">
+			<div class="button main flex flex-1 justify-between">
 				<button
 					class="text-inherit"
 					aria-label="Save current file"

@@ -10,5 +10,5 @@
 	<p>
 		{$page.error?.message}
 	</p>
-	<a href="/explorer" class="button normal">Return to Explorer</a>
+	<a href="/explorer" class="button main">Return to Explorer</a>
 </div>

@@ -23,10 +23,9 @@
 		return () => document.removeEventListener('keydown', handleKeyDown, true);
 	});
 
-	function handleKeyDown(e: KeyboardEvent) {
+	async function handleKeyDown(e: KeyboardEvent) {
 		// Ignore if the user is typing in an input
 		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
 		if (e.key === '/') {
 			e.preventDefault();
 			inputOpen = false;
@@ -67,7 +66,7 @@
 			Cancel
 		</button>
 		<button
-			class="button normal"
+			class="button main"
 			on:click={async () => {
 				if (newEntry.name.length === 0 || newEntry.icon.length === 0) return;
 				inputOpen = false;
@@ -121,18 +120,18 @@
 		<span
 			class="line-clamp-1 flex flex-1 flex-row items-center gap-4 text-ellipsis text-2xl font-bold"
 		>
-			<a href="/" class="button normal" aria-label="Navigate to parent directory">
+			<a href="/" class="button main" aria-label="Navigate to parent directory">
 				<Home />
 			</a>
 			<a
 				href={'/explorer/' + $currentPath.pathID.slice(0, -1).join('/')}
-				class="button normal"
+				class="button main"
 				aria-label="Navigate to parent directory"
 			>
 				<ChevronLeft />
 			</a>
 			<input
-				class="flex-1 overflow-scroll bg-foreground outline-none placeholder:text-accents6 dark:bg-background dark:text-primary dark:placeholder:text-accents2"
+				class="flex-1 overflow-scroll bg-foreground text-sm outline-none placeholder:text-accents6 dark:bg-background dark:text-primary dark:placeholder:text-accents2 sm:text-lg"
 				id="path-input"
 				placeholder="Type / to focus"
 				aria-label="Navigation path input field"
@@ -147,7 +146,7 @@
 					}
 					await currentPath.setPathFromName(pathInput.split('/'));
 					// Check if last item in path is a file
-					if ($currentPath?.pathData[$currentPath.pathData.length - 1]?.type === 'file') {
+					if ($currentPath.pathData[$currentPath.pathData.length - 1]?.type === 'file') {
 						await goto('/editor/' + $currentPath.pathID.join('/'));
 					} else {
 						await goto('/explorer/' + $currentPath.pathID.join('/'));
@@ -183,7 +182,7 @@
 				role="menu"
 				aria-label="Create New Entry"
 				aria-owns="folder note"
-				class="button normal"
+				class="button main"
 				on:click={() => (dropdownOpen = !dropdownOpen)}
 			>
 				<span class="hidden sm:inline-block">New</span>

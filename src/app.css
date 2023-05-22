@@ -33,7 +33,7 @@
 		@apply border-warn bg-warn hover:text-warn;
 	}
 
-	.normal {
+	.main {
 		@apply border-background bg-background text-foreground hover:bg-foreground hover:text-background focus:bg-foreground focus:text-background dark:border-foreground dark:bg-foreground dark:text-background dark:hover:bg-background dark:hover:text-foreground dark:focus:bg-background dark:focus:text-foreground;
 	}
 
