@@ -1,4 +1,4 @@
-import { getFileEntryHandle, resolveEntriesByID } from '$lib/client/explorer';
+import { getFileEntryHandle, readEntryContents, resolveEntriesByID } from '$lib/client/explorer';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
@@ -14,8 +14,11 @@ export const load = (async ({ params, depends }) => {
 
 	if (!entry || !entryHandle) throw error(404, 'Entry not found');
 
+	const entryContent = await readEntryContents(entryHandle);
+
 	return {
 		entry: entry[0],
-		entryHandle: entryHandle
+		entryHandle: entryHandle,
+		entryContent: entryContent
 	};
 }) satisfies PageLoad;
