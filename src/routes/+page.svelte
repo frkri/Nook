@@ -21,7 +21,7 @@
 		recent = (await getEntriesByID($recentNotes)) as EntryData[];
 		dirHandle = await navigator.storage.getDirectory();
 
-		importUrl = $page.url.searchParams.get('importURL') || '';
+		importUrl = $page.url.searchParams.get('import') || '';
 		if (importUrl.length > 0) {
 			importModalUrlOpen = true;
 		}

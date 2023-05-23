@@ -2,6 +2,7 @@
 	import type { EntryData } from '$lib/types';
 
 	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { getDirEntryHandle, removeEntries } from '$lib/client/explorer';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
@@ -32,7 +33,8 @@
 
 				$recentNotes = $recentNotes.filter((note) => note !== entry.id);
 				await removeEntries([entry.id], await getDirEntryHandle(entry.id));
-				await goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
+				if ($page.url.pathname.startsWith('/editor'))
+					await goto('/explorer/' + $currentPath.pathID.slice(0, -1).join('/'));
 				invalidate('entries:explorer-loader');
 			}}
 		>

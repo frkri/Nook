@@ -1,5 +1,5 @@
 [
-	"Use the ?remoteURL parameter to specify a remote URL to load.",
+	"Use the ?import parameter to specify a remote URL to load.",
 	"Use the Navigation bar to quickly navigate to a Directory or Note.",
 	"Use multiple Editor sessions to edit and preview Notes at the same time",
 	"Export Notes while editing them using the ctrl + e",
