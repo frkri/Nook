@@ -39,9 +39,9 @@
 <div class="m-4">
 	<div class="grid min-h-screen flex-col items-center justify-center gap-10">
 		<div class="flex flex-col items-center gap-4">
-			<h1 class="text-4xl font-black tracking-wider">
+			<h1 class="text-5xl font-black tracking-wider">
 				Welcome to <span
-					class="bg-gradient-to-r from-[#1e8b6e] to-[#0c8699] bg-clip-text text-transparent"
+					class="bg-animate bg-gradient-to-r from-[#000000] via-[#b4b4b4] to-[#000000] bg-clip-text text-transparent dark:from-[#ffffff] dark:via-[#474747] dark:to-[#ffffff]"
 				>
 					Nook.
 				</span>
@@ -84,3 +84,22 @@
 		</button>
 	</div>
 </div>
+
+<style>
+	.bg-animate {
+		animation: bg-transition 4s infinite alternate;
+		background-size: 800%;
+	}
+
+	@keyframes bg-transition {
+		from {
+			background-position: 0% 50%;
+		}
+		50% {
+			background-position: 50% 50%;
+		}
+		to {
+			background-position: 100% 50%;
+		}
+	}
+</style>
