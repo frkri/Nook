@@ -145,7 +145,6 @@ export async function createEntries(
 	for await (const newEntry of newEntries) {
 		const entry: EntryData = {
 			id: crypto.randomUUID(),
-			created: Date.now(),
 			modified: Date.now(),
 			description: '',
 			...newEntry
@@ -240,10 +239,31 @@ export async function writeEntryContents(
 	writable.truncate(0);
 	// Write new content to file
 	await writable.write(content);
-
 	await writable.close();
 
+	// Update modified date
+	updateEntry({
+		id: fileHandle.name,
+		modified: Date.now()
+	});
+
 	console.debug('Saved file: ' + fileHandle.name);
+}
+
+/**
+ * Updates an entry in the database and cache
+ * @param entry EntryData object with required ID and other optional properties to update
+ */
+export async function updateEntry(entry: Partial<EntryData> & { id: string }): Promise<void> {
+	const fullEntry = (await getEntriesByID([entry.id as string]))[0];
+	if (!fullEntry) return;
+
+	// Combine old entry with new entry, overwriting old properties
+	Object.assign(fullEntry, entry);
+
+	// Update entry
+	db.put('entries', fullEntry);
+	entryCache.set(fullEntry.id, fullEntry);
 }
 
 /**
@@ -291,8 +311,7 @@ export async function exportEntry(parentHandle: FileSystemDirectoryHandle) {
 			name: 'root',
 			icon: '',
 			type: 'directory',
-			created: Date.now(),
-			modified: Date.now(),
+			modified: 0,
 			description: ''
 		};
 	} else {

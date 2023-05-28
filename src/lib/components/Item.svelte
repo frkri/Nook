@@ -54,8 +54,13 @@
 			<h2 class="line-clamp-1 w-5 flex-1 dark:bg-background dark:text-primary">
 				{entry.name}
 			</h2>
+
+			<span class="text-xs text-secondary">
+				{new Date(entry.modified).toLocaleDateString()}
+			</span>
 		</a>
 	</header>
+
 	{#if entry.description}
 		<p
 			class="relative mx-8 line-clamp-2 overflow-hidden text-sm text-secondary

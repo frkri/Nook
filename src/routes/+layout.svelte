@@ -3,7 +3,7 @@
 	import Nav from '$lib/components/Nav.svelte';
 	import { currentPath } from '$lib/store/currentPath';
 	import { onMount } from 'svelte';
-	import FileDropzone from '$lib/components/fileDropzone.svelte';
+	import FileDropzone from '$lib/components/FileDropzone.svelte';
 
 	// Import styles
 	import '$lib/assets/fonts.css';

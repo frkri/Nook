@@ -6,7 +6,6 @@ export interface EntryDataBasic {
 
 export interface EntryData extends EntryDataBasic {
 	id: string; // UUID
-	created: number; // Timestamp
 	modified: number; // Timestamp
 	description: string;
 }

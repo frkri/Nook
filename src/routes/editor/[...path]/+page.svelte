@@ -50,6 +50,10 @@
 		userEntryContent = data.entryContent;
 		entryContentHTML = snarkdown(userEntryContent);
 
+		// Append entry to recent notes
+		if ($recentNotes.includes(entry.id)) return;
+		$recentNotes = [entry.id, ...$recentNotes.slice(0, 5)];
+
 		// Close previous broadcast channel
 		if (bc?.name === `editor:${entry.id}`) return;
 
@@ -63,10 +67,6 @@
 					break;
 			}
 		};
-
-		// Append entry to recent notes
-		if ($recentNotes.includes(entry.id)) return;
-		$recentNotes = [entry.id, ...$recentNotes.slice(0, 5)];
 	});
 
 	// Register Hotkeys

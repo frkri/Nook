@@ -29,4 +29,5 @@ async function initDB(dbName: string, dbVersion: number) {
 	return db;
 }
 
+// Dirty hack, but it works ¯\_(ツ)_/¯
 export const db = (await initDB('Nook', 1)) || (null as never);
