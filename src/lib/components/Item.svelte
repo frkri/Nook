@@ -41,19 +41,19 @@
 		class="button secondary"
 		on:click={() => {
 			modalItemOptionsOpen = false;
-			modalDeleteConfirmOpen = true;
+			modalItemEditOpen = true;
 		}}
 	>
-		<Trash /> Delete
+		<Edit /> Edit
 	</button>
 	<button
 		class="button secondary"
 		on:click={() => {
 			modalItemOptionsOpen = false;
-			modalItemEditOpen = true;
+			modalDeleteConfirmOpen = true;
 		}}
 	>
-		<Edit /> Edit
+		<Trash /> Delete
 	</button>
 </ActionModal>
 

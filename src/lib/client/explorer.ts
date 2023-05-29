@@ -8,7 +8,7 @@ import {
 	getMapEntryByName,
 	iterToArray,
 	walkDirectory
-} from '../client/utils';
+} from './utils';
 
 /**
  * Key-Value cache for entries

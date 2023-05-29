@@ -54,7 +54,7 @@
 			<p class="text-center text-lg">
 				Nook is a lightweight and simple note-taking app that supports offline usage and Markdown
 			</p>
-			<a href="/explorer" class="button main flex items-center justify-center p-6">
+			<a href="/explorer/" class="button main flex items-center justify-center p-6">
 				Open Explorer <ArrowRight />
 			</a>
 		</div>

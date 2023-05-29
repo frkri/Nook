@@ -341,17 +341,17 @@
 
 <div class="flex items-center justify-center px-2 dark:bg-background lg:mt-[180px]">
 	{#if $editorViewPreview}
-		<div class="prose px-2 dark:prose-invert xl:prose-xl">
+		<div class="prose px-2 dark:prose-invert xl:prose-xl my-12">
 			{#if entry.type === 'note'}
 				{@html entryContentHTML}
+			{:else if entry.type === 'video'}
+				<!-- svelte-ignore a11y-media-has-caption -->
+				<video src={data.entryContent} controls />
 			{:else if entry.type === 'audio'}
 				<audio src={data.entryContent} controls />
 			{:else if entry.type === 'image'}
 				<!-- svelte-ignore a11y-missing-attribute -->
 				<img src={data.entryContent} />
-			{:else if entry.type === 'video'}
-				<!-- svelte-ignore a11y-media-has-caption -->
-				<video src={data.entryContent} />
 			{/if}
 		</div>
 	{/if}
