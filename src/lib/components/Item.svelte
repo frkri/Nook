@@ -1,14 +1,18 @@
 <script lang="ts">
 	import type { EntryData } from '$lib/types';
 
-	import { getFileEntryHandle } from '$lib/client/explorer';
+	import { invalidate } from '$app/navigation';
+	import { getFileEntryHandle, updateEntry } from '$lib/client/explorer';
+	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
-	import { Trash } from 'lucide-svelte';
+	import { Edit, MoreVertical, Trash } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
 	export let entry: EntryData;
+	let modalItemOptionsOpen = false;
 	let modalDeleteConfirmOpen = false;
+	let modalItemEditOpen = false;
 
 	// Get basic description content of entry if it's a note
 	onMount(async () => {
@@ -32,6 +36,69 @@
 
 <DeleteEntryModal {entry} modalDeleteConfirm={modalDeleteConfirmOpen} />
 
+<ActionModal open={modalItemOptionsOpen} title="Entry options">
+	<button
+		class="button secondary"
+		on:click={() => {
+			modalItemOptionsOpen = false;
+			modalDeleteConfirmOpen = true;
+		}}
+	>
+		<Trash /> Delete
+	</button>
+	<button
+		class="button secondary"
+		on:click={() => {
+			modalItemOptionsOpen = false;
+			modalItemEditOpen = true;
+		}}
+	>
+		<Edit /> Edit
+	</button>
+</ActionModal>
+
+<!-- Entry edit modal -->
+<ActionModal bind:open={modalItemEditOpen} title="Edit">
+	<div class="flex justify-around gap-2 sm:m-3">
+		<input
+			bind:value={entry.icon}
+			maxlength="2"
+			class="border-main inline-flex w-9 items-center justify-center rounded-lg bg-accents7 p-1 text-xl dark:bg-accents2"
+		/>
+		<input
+			bind:value={entry.name}
+			maxlength="30"
+			class="border-main min-w-0 flex-1 bg-foreground p-2 font-bold placeholder:text-accents4 dark:bg-background dark:text-primary"
+		/>
+	</div>
+	<div class="flex justify-around">
+		<button
+			class="button secondary"
+			on:click={() => {
+				modalItemEditOpen = false;
+			}}
+		>
+			Cancel
+		</button>
+		<button
+			class="button main"
+			on:click={async () => {
+				if (entry.name.length === 0 || entry.icon.length === 0) return;
+				modalItemEditOpen = false;
+
+				await updateEntry({
+					id: entry.id,
+					name: entry.name,
+					icon: entry.icon
+				});
+				await invalidate('entries:explorer-loader');
+			}}
+		>
+			Create
+		</button>
+	</div>
+</ActionModal>
+
 <div
 	class="group flex w-full flex-col rounded-lg border border-accents6 p-2 transition hover:border-accents1 dark:border-accents2 dark:hover:border-accents6"
 >
@@ -40,14 +107,16 @@
 			class="group-focus-within:inline-block group-hover:inline-block"
 			aria-label="Delete entry"
 			on:click={() => {
-				modalDeleteConfirmOpen = true;
+				modalItemOptionsOpen = true;
 			}}
 		>
-			<Trash class="stroke-accents7 transition hover:stroke-alert dark:stroke-accents1" />
+			<MoreVertical
+				class="stroke-accents6 transition hover:stroke-background dark:stroke-accents2 dark:hover:stroke-foreground"
+			/>
 		</button>
 		<a href={entryPath} class="flex flex-1 items-center gap-3">
 			<span
-				class="inline-flex w-9 items-center justify-center rounded-lg bg-accents7 p-1 text-xl dark:bg-accents2"
+				class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-accents7 p-1 text-xl dark:bg-accents2"
 			>
 				{entry.icon}
 			</span>

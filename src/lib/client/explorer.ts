@@ -266,7 +266,7 @@ export async function writeEntryContents(
 }
 
 /**
- * Updates an entry in the database and cache
+ * Updates an entry in the database
  * @param entry EntryData object with required ID and other optional properties to update
  */
 export async function updateEntry(entry: Partial<EntryData> & { id: string }): Promise<void> {
