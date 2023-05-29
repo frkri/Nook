@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
 	import { writeEntryContents } from '$lib/client/explorer';
+	import { parseMarkdown } from '$lib/client/parser';
 	import { downloadFile } from '$lib/client/utils';
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
@@ -28,7 +29,6 @@
 		Save,
 		Trash
 	} from 'lucide-svelte';
-	import snarkdown from 'snarkdown';
 	import { onDestroy } from 'svelte';
 
 	// Load entry data from page.ts
@@ -43,7 +43,6 @@
 
 	let entryContentHTML = '';
 	let bc: BroadcastChannel | null = null;
-
 	let isMaximized = document.fullscreenElement !== null;
 
 	afterNavigate(async () => {
@@ -126,9 +125,11 @@
 		}, $autoSaveDelay);
 	}
 
-	function renderMarkdown(content: string) {
+	async function renderMarkdown(content: string) {
 		if (entry.type !== 'note') return;
-		entryContentHTML = snarkdown(content);
+		console.log('rendering markdown');
+		entryContentHTML = await parseMarkdown(content);
+		//entryContentHTML = snarkdown(content);
 	}
 
 	function handleExportFile() {
