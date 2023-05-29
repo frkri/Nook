@@ -62,7 +62,7 @@
 	<div class="flex justify-around gap-2 sm:m-3">
 		<input
 			bind:value={entry.icon}
-			maxlength="2"
+			maxlength="3"
 			class="border-main inline-flex w-9 items-center justify-center rounded-lg bg-accents7 p-1 text-xl dark:bg-accents2"
 		/>
 		<input

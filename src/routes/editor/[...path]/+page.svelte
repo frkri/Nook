@@ -127,9 +127,7 @@
 
 	async function renderMarkdown(content: string) {
 		if (entry.type !== 'note') return;
-		console.log('rendering markdown');
 		entryContentHTML = await parseMarkdown(content);
-		//entryContentHTML = snarkdown(content);
 	}
 
 	function handleExportFile() {
