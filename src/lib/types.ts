@@ -25,5 +25,7 @@ export interface Export extends EntryData {
 }
 
 export const broadcastMessage = {
+	Hello: 'hello',
+	HelloResponse: 'hello-response',
 	SaveFile: 'save-file'
 } as const;

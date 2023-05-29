@@ -24,6 +24,7 @@
 		Edit,
 		ExternalLink,
 		FileText,
+		Link,
 		Maximize,
 		Minimize,
 		Save,
@@ -42,8 +43,11 @@
 	let modalExportFile = false;
 
 	let entryContentHTML = '';
-	let bc: BroadcastChannel | null = null;
 	let isMaximized = document.fullscreenElement !== null;
+
+	let bc: BroadcastChannel | null = null;
+	let connectedInstances: number = 0;
+	let helloTimer: number | null = null;
 
 	afterNavigate(async () => {
 		// Switch to preview view if not editing a note
@@ -53,22 +57,44 @@
 		renderMarkdown(userEntryContent);
 
 		// Append entry to recent files
-		if ($recentFiles.includes(entry.id)) return;
-		$recentFiles = [entry.id, ...$recentFiles.slice(0, 5)];
+		if (!$recentFiles.includes(entry.id)) $recentFiles = [entry.id, ...$recentFiles.slice(0, 5)];
 
+		if (!$autoBroadcastState) return;
 		// Close previous broadcast channel
 		if (bc?.name === `editor:${entry.id}`) return;
 
+		// Cleanup previous broadcast channel
+		if (helloTimer) clearInterval(helloTimer);
+		let editorID = crypto.randomUUID();
+		connectedInstances = 0;
 		bc?.close();
+
+		// Create new broadcast channel
 		bc = new BroadcastChannel(`editor:${entry.id}`);
+		if (bc === null) return;
+
+		// Send hello message every 8 seconds
+		helloTimer = setInterval(() => {
+			connectedInstances = 0;
+			bc?.postMessage({ type: broadcastMessage.Hello, id: editorID });
+		}, 8000);
+
 		bc.onmessage = (e) => {
 			switch (e.data.type) {
+				case broadcastMessage.Hello:
+					bc?.postMessage({ type: broadcastMessage.HelloResponse, id: e.data.id });
+					break;
+				case broadcastMessage.HelloResponse:
+					if (e.data.id === editorID) connectedInstances++;
+					break;
 				case broadcastMessage.SaveFile:
 					userEntryContent = e.data.content;
 					renderMarkdown(userEntryContent);
 					break;
 			}
 		};
+
+		bc?.postMessage({ type: broadcastMessage.Hello, id: editorID });
 	});
 
 	// Register & Unregister Hotkeys
@@ -217,6 +243,11 @@
 		}}><Code2 class="w-4" />HTML</button
 	>
 </ActionModal>
+
+<div class="fixed bottom-0 right-0 flex items-center justify-center gap-1 p-1">
+	<span class="text-xs text-accents3">{connectedInstances}</span>
+	<Link size={14} class="stroke-accents3" />
+</div>
 
 <menu class="z-10 flex w-full justify-between p-2 lg:fixed lg:top-[60px]">
 	<div class="flex flex-col">
