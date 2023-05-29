@@ -145,8 +145,10 @@
 						pathInput = pathInput.slice(0, -1);
 					}
 					await currentPath.setPathFromName(pathInput.split('/'));
-					// Check if last item in path is a note
-					if ($currentPath.pathData[$currentPath.pathData.length - 1]?.type === 'note') {
+					console.log($currentPath.pathData[$currentPath.pathData.length - 1]?.type);
+					const currentPathType = $currentPath.pathData[$currentPath.pathData.length - 1]?.type;
+					// Check if last item in path is not a directory
+					if (currentPathType !== 'directory' && currentPathType !== undefined) {
 						await goto('/editor/' + $currentPath.pathID.join('/'));
 					} else {
 						await goto('/explorer/' + $currentPath.pathID.join('/'));

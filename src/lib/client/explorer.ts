@@ -66,7 +66,7 @@ export async function getEntriesByID(ids: string[]): Promise<(EntryData | null)[
  * @param Names
  * @returns Array with resolved Entries, or null if not found
  */
-export async function getEntriesByName(names: string[]): Promise<(EntryData | null)[]> {
+export async function getEntriesByName(entriesNames: string[]): Promise<(EntryData | null)[]> {
 	// Open new transaction
 	const tx = db.transaction('entries', 'readonly');
 	const index = tx.store.index('name-index');
@@ -74,20 +74,18 @@ export async function getEntriesByName(names: string[]): Promise<(EntryData | nu
 	// For each name, check the cache first, then the database
 	// If it's not in either, return null
 	const entries = await Promise.all(
-		names.map(async (name) => {
+		entriesNames.map(async (entryName) => {
 			// Check cache for entry
-			let entry = await getMapEntryByName(entryCache, name);
+			let entry = await getMapEntryByName(entryCache, entryName);
 
 			if (entry) {
-				console.debug('Cache hit for', name);
+				console.debug('Cache hit for', entryName);
 				return entry;
 			} else {
-				// If not in cache, fetch from database & add to cache
-				console.debug('Cache miss for', name);
-
-				entry = await index.get(name);
+				console.debug('Cache miss for', entryName);
+				entry = await index.get(entryName);
 				if (entry) {
-					entryCache.set(name, entry);
+					entryCache.set(entry.id, entry);
 					return entry;
 				}
 
