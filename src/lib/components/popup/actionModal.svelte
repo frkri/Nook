@@ -6,8 +6,11 @@
 	export let open = false;
 	export let title = '';
 
+	let node: HTMLElement | undefined;
+
 	$: if (!open) {
 		document.removeEventListener('keydown', handleKeyDown, true);
+		document.addEventListener('focus', handleFocus, true);
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -16,17 +19,28 @@
 		}
 	}
 
-	function useNode(node: HTMLElement) {
+	// Simple focus trap
+	function handleFocus(e: FocusEvent) {
+		if (node?.contains(e.target as Node) === false) {
+			e.preventDefault();
+			var firstFocusableElement = node.querySelector<HTMLElement>('button, input');
+			if (firstFocusableElement) firstFocusableElement.focus();
+		}
+	}
+
+	// Run on first render of modal
+	function useNode(newNode: HTMLElement) {
+		node = newNode;
+
 		document.addEventListener('keydown', handleKeyDown, true);
+		document.addEventListener('focus', handleFocus, true);
 
 		// Wait for the DOM to update
 		tick().then(() => {
-			var firstInputElement = node.querySelector<HTMLElement>(
-				'input:first-child, button:first-child'
-			);
+			var firstFocusableElement = newNode.querySelector<HTMLElement>('button, input');
 
 			// Focus the first input or button
-			if (firstInputElement) firstInputElement?.focus();
+			if (firstFocusableElement) firstFocusableElement.focus();
 		});
 	}
 </script>
