@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { File } from 'lucide-svelte';
-	import { onMount } from 'svelte';
-
 	import { invalidate } from '$app/navigation';
 	import { createEntries, getDirEntryHandle } from '$lib/client/explorer';
+	import { isAudio, isImage, isText, isVideo } from '$lib/client/utils';
 	import { currentPath } from '$lib/store/currentPath';
-	import type { EntryDataBasic } from '$lib/types';
+	import type { EntryDataBasic, EntryType } from '$lib/types';
+	import { File } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	let shouldShowDropZone = false;
@@ -26,30 +26,45 @@
 		if (!files) return;
 
 		let dirHandle = getDirEntryHandle($currentPath.currentEntryID);
-
-		let entriesData: string[] = [];
+		let entriesData: (string | ArrayBuffer)[] = [];
 		let entries: EntryDataBasic[] = [];
+
 		for await (const file of files) {
 			if (!file.name) continue;
+			// Get the file name without the extension else use the full name
+			let newFilename = file.name;
 
-			try {
-				// Get the file name without the extension else use the full name
+			// Determine the file type, if it's a markdown or text file, it's a note
+			let type: EntryType = 'note';
+			let icon = '📝';
+			if (isText(file.name)) {
+				// Remove the extension from the filename
 				const dotIndex = file.name.lastIndexOf('.');
-				const newFilename = file.name.substring(0, dotIndex === -1 ? file.name.length : dotIndex);
-
-				entries.push({
-					name: newFilename,
-					icon: '📝',
-					type: 'file'
-				});
+				newFilename = file.name.substring(0, dotIndex === -1 ? file.name.length : dotIndex);
 
 				entriesData.push(await file.text());
-			} catch (error) {
-				continue;
+			} else if (isImage(file.name)) {
+				type = 'image';
+				icon = '🖼️';
+			} else if (isAudio(file.name)) {
+				type = 'audio';
+				icon = '🎵';
+			} else if (isVideo(file.name)) {
+				type = 'video';
+				icon = '🎥';
 			}
+
+			entries.push({
+				name: newFilename,
+				icon,
+				type
+			});
+
+			// Fetch the file data
+			if (type === 'note') entriesData.push(await file.text());
+			else entriesData.push(await file.arrayBuffer());
 		}
 		await createEntries(entries, await dirHandle, entriesData);
-
 		invalidate('entries:explorer-loader');
 	}
 

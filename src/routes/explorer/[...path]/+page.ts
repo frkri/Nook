@@ -34,7 +34,7 @@ export const load = (async ({ params, depends }) => {
 		(entry) => entry?.type === 'directory' && entry !== null
 	) as EntryData[];
 	const fileEntries = reslovedEntries.filter(
-		(entry) => entry?.type === 'file' && entry !== null
+		(entry) => entry?.type !== 'directory' && entry !== null
 	) as EntryData[];
 
 	// Sort entries by name

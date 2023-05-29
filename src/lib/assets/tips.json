@@ -1,10 +1,10 @@
 [
-	"Use the ?import parameter to specify a remote URL to load.",
-	"Use the Navigation bar to quickly navigate to a Directory or Note.",
+	"Use the ?import parameter to specify a remote URL to import",
+	"Use the Navigation bar to quickly navigate to a Directory or Note",
 	"Use multiple Editor sessions to edit and preview Notes at the same time",
 	"Export Notes while editing them using the ctrl + e",
 	"Switch between Editor and Preview using ctrl + q",
 	"Save Notes quickly using ctrl + s",
-	"Use / to quickly focus the Navigation bar.",
-	"Drag and Drop text files anywhere in this window to create Notes."
+	"Use / to quickly focus the Navigation bar",
+	"Drag and Drop files anywhere in this window to import them"
 ]

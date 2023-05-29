@@ -5,29 +5,27 @@
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import { File, Link } from 'lucide-svelte';
 
-	export let open = false;
+	export let importModalOpen = false;
+	export let importModalURLOpen = false;
+
 	export let dirHandle: FileSystemDirectoryHandle;
-
-	export let openUrl = false;
-
 	export let importUrl = '';
 	let files: FileList | null = null;
 
 	async function importRoot(content: string) {
 		let obj = JSON.parse(content);
 		await importEntry(obj, dirHandle);
-
 		invalidateAll();
 	}
 </script>
 
-<ActionModal {open} title="Import Bucket from">
+<ActionModal open={importModalOpen} title="Import Bucket from">
 	<div class="flex flex-col gap-2">
 		<button
 			class="button secondary"
 			on:click={() => {
-				open = false;
-				openUrl = true;
+				importModalOpen = false;
+				importModalURLOpen = true;
 			}}
 		>
 			<Link />Remote
@@ -44,7 +42,7 @@
 			accept="application/json"
 			bind:files
 			on:change={async () => {
-				open = false;
+				importModalOpen = false;
 				if (!files) return;
 				importRoot(await files[0].text());
 			}}
@@ -52,7 +50,7 @@
 	</div>
 </ActionModal>
 
-<ActionModal open={openUrl} title="URL to import">
+<ActionModal open={importModalURLOpen} title="URL to import">
 	<div class="flex justify-around gap-2 sm:m-3">
 		<input
 			bind:value={importUrl}
@@ -64,7 +62,7 @@
 		<button
 			class="button secondary"
 			on:click={() => {
-				openUrl = false;
+				importModalURLOpen = false;
 			}}
 		>
 			Cancel
@@ -77,7 +75,7 @@
 				const result = await fetchRemoteFile(new URL(importUrl));
 				if (!result) return;
 
-				openUrl = false;
+				importModalURLOpen = false;
 				importRoot(result);
 				importUrl = '';
 

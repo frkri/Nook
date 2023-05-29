@@ -1,8 +1,14 @@
 // Using @types/wicg-file-system-access for FileSystem API types support
-import type { EntryData, EntryDataBasic, Export } from '$lib/types';
+import type { EntryData, EntryDataBasic, EntryType, Export } from '$lib/types';
 
 import { db } from '$lib/client/db';
-import { getMapEntryByName, iterToArray, walkDirectory } from '../client/utils';
+import {
+	createBase64FromBuffer,
+	createBufferFromBase64,
+	getMapEntryByName,
+	iterToArray,
+	walkDirectory
+} from '../client/utils';
 
 /**
  * Key-Value cache for entries
@@ -135,11 +141,10 @@ export async function resolveEntriesByName(path: string[]): Promise<EntryData[]>
 export async function createEntries(
 	newEntries: EntryDataBasic[],
 	currentDirHandle?: FileSystemDirectoryHandle,
-	contents?: string[]
+	contents?: (string | ArrayBuffer)[]
 ) {
 	// Get root directory handle if not provided
 	if (!currentDirHandle) currentDirHandle = await navigator.storage.getDirectory();
-
 	console.log('Creating entries', newEntries, 'in', currentDirHandle);
 
 	for await (const newEntry of newEntries) {
@@ -164,7 +169,7 @@ export async function createEntries(
 		if (entry.type === 'directory') {
 			const handle = await currentDirHandle.getDirectoryHandle(entry.id, { create: true });
 			handleCache.set(entry.id, handle);
-		} else if (entry.type === 'file') {
+		} else {
 			const fileHandle = await currentDirHandle.getFileHandle(entry.id, { create: true });
 
 			if (contents === undefined) return;
@@ -223,15 +228,25 @@ export async function getFileEntryHandle(
 	return fileHandle;
 }
 
-export async function readEntryContents(fileHandle: FileSystemFileHandle): Promise<string> {
+/**
+ * Returns the contents of a file as a string in Base64 or UTF-8
+ * @param fileHandle
+ * @param fileType
+ * @returns A string containing the contents of the file in Base64 or UTF-8
+ */
+export async function readEntryContents(
+	fileHandle: FileSystemFileHandle,
+	fileType?: EntryType
+): Promise<string> {
 	const file = await fileHandle.getFile();
 
-	return await file.text();
+	if (fileType === 'note') return await file.text();
+	else return await createBase64FromBuffer(await file.arrayBuffer());
 }
 
 export async function writeEntryContents(
 	fileHandle: FileSystemFileHandle,
-	content: string
+	content: string | ArrayBuffer
 ): Promise<void> {
 	const writable = await fileHandle.createWritable();
 
@@ -321,22 +336,24 @@ export async function exportEntry(parentHandle: FileSystemDirectoryHandle) {
 		parent = parentData;
 	}
 
-	// Retrive info about children entries of parent
-	const entriesIDs = await iterToArray(parentHandle.keys());
-	const entries = (await getEntriesByID(entriesIDs)).filter((e) => e !== null) as EntryData[];
-
 	const exportData: Export = {
 		...parent,
 		children: []
 	};
-
 	if (exportData.children === undefined) return exportData;
 
+	// Retrive info about children entries of parent
+	const entriesIDs = await iterToArray(parentHandle.keys());
+	const entries = (await getEntriesByID(entriesIDs)).filter((e) => e !== null) as EntryData[];
+
 	for await (const entry of entries) {
-		if (entry.type === 'file') {
+		if (entry.type !== 'directory') {
+			const childHandle = await parentHandle.getFileHandle(entry.id);
+			const childData = await readEntryContents(childHandle, entry.type);
+
 			exportData.children.push({
 				...entry,
-				content: await readEntryContents(await parentHandle.getFileHandle(entry.id))
+				content: childData
 			});
 		} else if (entry.type === 'directory') {
 			const childData = await exportEntry(await parentHandle.getDirectoryHandle(entry.id));
@@ -375,7 +392,11 @@ export async function importEntry(entries: Export, parentHandle?: FileSystemDire
 
 			// Write to file if content is defined
 			if (entry.content === undefined) return;
-			await writeEntryContents(entryHandle, entry.content);
+
+			let content: string | ArrayBuffer = entry.content;
+			if (entry.type !== 'note') content = createBufferFromBase64(content);
+
+			await writeEntryContents(entryHandle, content);
 		}
 	}
 }

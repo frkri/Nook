@@ -15,11 +15,11 @@ viewTypeList.subscribe((value) => {
 /**
  * Creates a Store for display of Editor view that also writes to localStorage
  */
-export const viewTypeEditor = writable<boolean>(
-	localStorage.getItem('prefers-viewTypeEditor-Edit') === 'true'
+export const editorViewPreview = writable<boolean>(
+	localStorage.getItem('prefers-editorViewPreview') === 'true'
 );
-viewTypeEditor.subscribe((value) => {
-	localStorage.setItem('prefers-viewTypeEditor-Edit', value.toString());
+editorViewPreview.subscribe((value) => {
+	localStorage.setItem('prefers-editorViewPreview', value.toString());
 });
 
 /*

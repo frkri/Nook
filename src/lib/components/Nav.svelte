@@ -35,7 +35,7 @@
 	}
 
 	let newEntry: EntryDataBasic = {
-		type: 'file',
+		type: 'note',
 		name: '',
 		icon: ''
 	};
@@ -52,7 +52,7 @@
 		<input
 			bind:value={newEntry.name}
 			maxlength="30"
-			placeholder={newEntry.type === 'file' ? 'New Note' : 'New Folder'}
+			placeholder={newEntry.type === 'note' ? 'New Note' : 'New Folder'}
 			class="border-main min-w-0 flex-1 bg-foreground p-2 font-bold placeholder:text-accents4 dark:bg-background dark:text-primary"
 		/>
 	</div>
@@ -103,7 +103,7 @@
 		id="note"
 		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
 		on:click={() => {
-			newEntry.type = 'file';
+			newEntry.type = 'note';
 			newEntry.icon = '📝';
 
 			inputOpen = true;
@@ -145,8 +145,8 @@
 						pathInput = pathInput.slice(0, -1);
 					}
 					await currentPath.setPathFromName(pathInput.split('/'));
-					// Check if last item in path is a file
-					if ($currentPath.pathData[$currentPath.pathData.length - 1]?.type === 'file') {
+					// Check if last item in path is a note
+					if ($currentPath.pathData[$currentPath.pathData.length - 1]?.type === 'note') {
 						await goto('/editor/' + $currentPath.pathID.join('/'));
 					} else {
 						await goto('/explorer/' + $currentPath.pathID.join('/'));

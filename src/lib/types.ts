@@ -6,22 +6,24 @@ export interface EntryDataBasic {
 
 export interface EntryData extends EntryDataBasic {
 	id: string; // UUID
-	modified: number; // Timestamp
+	modified: number; // UNIX Timestamp
 	description: string;
 }
 
 const entryType = {
 	Directory: 'directory',
-	File: 'file'
+	Note: 'note', // String content
+	Img: 'image',
+	Video: 'video',
+	Audio: 'audio'
 } as const;
-
 export type EntryType = (typeof entryType)[keyof typeof entryType];
-
-export const broadcastMessage = {
-	SaveFile: 'save-file'
-} as const;
 
 export interface Export extends EntryData {
 	content?: string;
 	children?: Export[];
 }
+
+export const broadcastMessage = {
+	SaveFile: 'save-file'
+} as const;

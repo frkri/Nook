@@ -5,13 +5,13 @@
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
-	import { recentNotes } from '$lib/store/recentNotes.js';
+	import { recentFiles } from '$lib/store/recentFiles.js';
 	import {
 		autoBroadcastState,
 		autoSaveDelay,
 		autoSaveEditor,
-		hotkeysEnabled,
-		viewTypeEditor
+		editorViewPreview,
+		hotkeysEnabled
 	} from '$lib/store/userPreferences';
 	import { broadcastMessage } from '$lib/types';
 	import {
@@ -34,7 +34,7 @@
 	// Load entry data from page.ts
 	export let data;
 	$: ({ entry, entryHandle } = data);
-	let userEntryContent = data.entryContent;
+	let userEntryContent = '';
 
 	// Modal states
 	let modalDeleteConfirm = false;
@@ -47,12 +47,15 @@
 	let isMaximized = document.fullscreenElement !== null;
 
 	afterNavigate(async () => {
-		userEntryContent = data.entryContent;
-		entryContentHTML = snarkdown(userEntryContent);
+		// Switch to preview view if not editing a note
+		if (entry.type !== 'note') $editorViewPreview = true;
 
-		// Append entry to recent notes
-		if ($recentNotes.includes(entry.id)) return;
-		$recentNotes = [entry.id, ...$recentNotes.slice(0, 5)];
+		userEntryContent = data.entryContent;
+		renderMarkdown(userEntryContent);
+
+		// Append entry to recent files
+		if ($recentFiles.includes(entry.id)) return;
+		$recentFiles = [entry.id, ...$recentFiles.slice(0, 5)];
 
 		// Close previous broadcast channel
 		if (bc?.name === `editor:${entry.id}`) return;
@@ -63,13 +66,13 @@
 			switch (e.data.type) {
 				case broadcastMessage.SaveFile:
 					userEntryContent = e.data.content;
-					entryContentHTML = snarkdown(userEntryContent);
+					renderMarkdown(userEntryContent);
 					break;
 			}
 		};
 	});
 
-	// Register Hotkeys
+	// Register & Unregister Hotkeys
 	$: if ($hotkeysEnabled) document.addEventListener('keydown', handleKeyDown, true);
 	else document.removeEventListener('keydown', handleKeyDown, true);
 	onDestroy(() => {
@@ -89,12 +92,12 @@
 					break;
 				case 'e':
 					e.preventDefault();
-					modalExportFile = !modalExportFile;
+					handleExportFile();
 					break;
 				case 'q':
 					e.preventDefault();
-					$viewTypeEditor = !$viewTypeEditor;
-					entryContentHTML = snarkdown(userEntryContent);
+					$editorViewPreview = !$editorViewPreview;
+					renderMarkdown(userEntryContent);
 					break;
 			}
 	}
@@ -104,6 +107,8 @@
 	let recentlySaved = false;
 	let saveTimeout: number | null = null;
 	async function handleSave() {
+		if (entry.type !== 'note') return;
+
 		// Reset timeout
 		if (saveTimeout) clearTimeout(saveTimeout);
 
@@ -119,6 +124,23 @@
 				recentlySaved = false;
 			}, 1000);
 		}, $autoSaveDelay);
+	}
+
+	function renderMarkdown(content: string) {
+		if (entry.type !== 'note') return;
+		entryContentHTML = snarkdown(content);
+	}
+
+	function handleExportFile() {
+		if (entry.type === 'note') {
+			modalExportFile = !modalExportFile;
+			return;
+		}
+
+		// Download all other file types
+		entryHandle.getFile().then(async (file) => {
+			downloadFile(entry.name, '', '', await file.arrayBuffer());
+		});
 	}
 </script>
 
@@ -139,6 +161,15 @@
 			</button>
 		</div>
 		<div class="flex items-center justify-between">
+			<label for="autoSaveDelay">Autosave delay (ms)</label>
+			<input
+				id="autoSaveDelay"
+				type="number"
+				class="border-main w-20 p-2 font-bold dark:bg-background"
+				bind:value={$autoSaveDelay}
+			/>
+		</div>
+		<div class="flex items-center justify-between">
 			<label for="autoBroadcastState">Broadcast file updates</label>
 			<button
 				class="button main flex w-20 items-center justify-center"
@@ -150,16 +181,6 @@
 				{$autoBroadcastState ? 'On' : 'Off'}
 			</button>
 		</div>
-		<div class="flex items-center justify-between">
-			<label for="autoSaveDelay">Autosave delay (ms)</label>
-			<input
-				id="autoSaveDelay"
-				type="number"
-				class="border-main w-20 p-2 font-bold dark:bg-background"
-				bind:value={$autoSaveDelay}
-			/>
-		</div>
-
 		<div class="flex items-center justify-between">
 			<label for="hotkeysEnabled">Enable hotkeys</label>
 			<button
@@ -191,7 +212,7 @@
 		aria-label="Export as HTML file"
 		class="button secondary flex w-full gap-1 border-none hover:bg-accents7 dark:hover:bg-accents2"
 		on:click={() => {
-			entryContentHTML = snarkdown(userEntryContent);
+			renderMarkdown(userEntryContent);
 			downloadFile(entry.name, 'html', 'text/html', entryContentHTML);
 			modalExportFile = false;
 		}}><Code2 class="w-4" />HTML</button
@@ -203,7 +224,7 @@
 		<button
 			class="button secondary mb-2 flex justify-between"
 			on:click={() => {
-				modalExportFile = true;
+				handleExportFile();
 			}}
 		>
 			Export <Download />
@@ -212,24 +233,26 @@
 			class="flex h-10 justify-between rounded-lg border border-accents4 p-1 dark:aria-checked:bg-accents2"
 			role="radiogroup"
 		>
+			{#if entry.type === 'note'}
+				<button
+					class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
+					aria-checked={!$editorViewPreview}
+					aria-label="Switch to edit mode"
+					role="radio"
+					on:click={() => editorViewPreview.set(false)}
+				>
+					<Edit class="switch w-6" />
+					<span class="switch flex-1">Edit</span>
+				</button>
+			{/if}
 			<button
 				class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
-				aria-checked={!$viewTypeEditor}
-				aria-label="Switch to edit mode"
-				role="radio"
-				on:click={() => viewTypeEditor.set(false)}
-			>
-				<Edit class="switch w-6" />
-				<span class="switch flex-1">Edit</span>
-			</button>
-			<button
-				class="group flex w-24 items-center justify-between gap-1 rounded p-1 aria-checked:bg-accents1 aria-[checked='true']:hidden dark:aria-checked:bg-accents2 sm:aria-[checked='true']:flex"
-				aria-checked={$viewTypeEditor}
+				aria-checked={$editorViewPreview}
 				aria-label="Switch to preview mode"
 				role="radio"
 				on:click={() => {
-					viewTypeEditor.set(true);
-					entryContentHTML = snarkdown(userEntryContent);
+					editorViewPreview.set(true);
+					renderMarkdown(userEntryContent);
 				}}
 			>
 				<FileText class="switch w-6" />
@@ -277,8 +300,9 @@
 			</button>
 		</div>
 		<div class="mt-2 flex gap-2">
-			<div class="button main flex flex-1 justify-between">
+			<div class="button flex flex-1 justify-between" class:main={entry.type === 'note'}>
 				<button
+					disabled={entry.type !== 'note'}
 					class="text-inherit"
 					aria-label="Save current file"
 					on:click={() => {
@@ -316,15 +340,26 @@
 </menu>
 
 <div class="flex items-center justify-center px-2 dark:bg-background lg:mt-[180px]">
-	{#if $viewTypeEditor}
+	{#if $editorViewPreview}
 		<div class="prose px-2 dark:prose-invert xl:prose-xl">
-			{@html entryContentHTML}
+			{#if entry.type === 'note'}
+				{@html entryContentHTML}
+			{:else if entry.type === 'audio'}
+				<audio src={data.entryContent} controls />
+			{:else if entry.type === 'image'}
+				<!-- svelte-ignore a11y-missing-attribute -->
+				<img src={data.entryContent} />
+			{:else if entry.type === 'video'}
+				<!-- svelte-ignore a11y-media-has-caption -->
+				<video src={data.entryContent} />
+			{/if}
 		</div>
 	{/if}
+
 	<textarea
 		on:input={$autoSaveEditor ? handleSave : undefined}
 		bind:value={userEntryContent}
-		class:hidden={$viewTypeEditor}
+		class:hidden={$editorViewPreview}
 		class="h-[calc(100vh-200px)] w-full resize-none rounded border border-accents6 bg-inherit px-2 leading-7 outline-none focus:border-accents1 dark:focus:border-accents7"
 	/>
 </div>

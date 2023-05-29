@@ -8,12 +8,12 @@
 	import { onMount } from 'svelte';
 
 	export let entry: EntryData;
-
-	let modalDeleteConfirm = false;
+	let modalDeleteConfirmOpen = false;
 
 	// Get basic description content of entry if it's a note
 	onMount(async () => {
-		if (entry.type !== 'file') return;
+		if (entry.type !== 'note') return;
+
 		let entryHandle = await getFileEntryHandle(entry.id);
 		if (entryHandle) {
 			let file = await entryHandle.getFile();
@@ -30,7 +30,7 @@
 		entry.id;
 </script>
 
-<DeleteEntryModal {entry} {modalDeleteConfirm} />
+<DeleteEntryModal {entry} modalDeleteConfirm={modalDeleteConfirmOpen} />
 
 <div
 	class="group flex w-full flex-col rounded-lg border border-accents6 p-2 transition hover:border-accents1 dark:border-accents2 dark:hover:border-accents6"
@@ -40,7 +40,7 @@
 			class="group-focus-within:inline-block group-hover:inline-block"
 			aria-label="Delete entry"
 			on:click={() => {
-				modalDeleteConfirm = true;
+				modalDeleteConfirmOpen = true;
 			}}
 		>
 			<Trash class="stroke-accents7 transition hover:stroke-alert dark:stroke-accents1" />
