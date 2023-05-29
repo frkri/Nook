@@ -12,7 +12,7 @@
 			"created": 1684406191376,
 			"modified": 1684406191376,
 			"description": "# Hello!",
-			"type": "file",
+			"type": "note",
 			"name": "Example Note",
 			"icon": "📝",
 			"content": "# Hello!"
@@ -31,7 +31,7 @@
 					"created": 1684406418947,
 					"modified": 1684406418947,
 					"description": "# Hello from sub note!",
-					"type": "file",
+					"type": "note",
 					"name": "Example Sub Note",
 					"icon": "📝",
 					"content": "# Hello from sub note!"
