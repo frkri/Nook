@@ -19,7 +19,7 @@
 	}
 </script>
 
-<ActionModal open={importModalOpen} title="Import Bucket from">
+<ActionModal bind:open={importModalOpen} title="Import Bucket from">
 	<div class="flex flex-col gap-2">
 		<button
 			class="button secondary"
@@ -50,7 +50,7 @@
 	</div>
 </ActionModal>
 
-<ActionModal open={importModalURLOpen} title="URL to import">
+<ActionModal bind:open={importModalURLOpen} title="URL to import">
 	<div class="flex justify-around gap-2 sm:m-3">
 		<input
 			bind:value={importUrl}

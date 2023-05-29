@@ -34,9 +34,9 @@
 		entry.id;
 </script>
 
-<DeleteEntryModal {entry} modalDeleteConfirm={modalDeleteConfirmOpen} />
+<DeleteEntryModal {entry} bind:modalDeleteConfirm={modalDeleteConfirmOpen} />
 
-<ActionModal open={modalItemOptionsOpen} title="Entry options">
+<ActionModal bind:open={modalItemOptionsOpen} title="Entry options">
 	<button
 		class="button secondary"
 		on:click={() => {

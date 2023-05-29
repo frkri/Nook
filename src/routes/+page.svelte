@@ -34,7 +34,12 @@
 	}
 </script>
 
-<ImportModal {importModalOpen} importModalURLOpen={importModalUrlOpen} {importUrl} {dirHandle} />
+<ImportModal
+	bind:importModalOpen
+	bind:importModalURLOpen={importModalUrlOpen}
+	{importUrl}
+	{dirHandle}
+/>
 
 <div class="m-4">
 	<div class="grid min-h-screen flex-col items-center justify-center gap-10">

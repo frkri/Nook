@@ -144,7 +144,7 @@
 	}
 </script>
 
-<DeleteEntryModal {entry} {modalDeleteConfirm} />
+<DeleteEntryModal {entry} bind:modalDeleteConfirm />
 
 <ActionModal bind:open={modalSaveOptions} title="Save options">
 	<div class="flex flex-col justify-between gap-2">
