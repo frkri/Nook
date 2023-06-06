@@ -372,7 +372,7 @@
 
 <div class="flex items-center justify-center px-2 dark:bg-background lg:mt-[180px]">
 	{#if $editorViewPreview}
-		<div class="prose my-12 px-2 dark:prose-invert xl:prose-xl">
+		<div class="prose my-12 w-screen px-2 dark:prose-invert xl:prose-xl">
 			{#if entry.type === 'note'}
 				{@html entryContentHTML}
 			{:else if entry.type === 'video'}
