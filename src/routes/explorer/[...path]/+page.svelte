@@ -2,6 +2,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import tips from '$lib/assets/tips.json';
 	import Item from '$lib/components/Item.svelte';
+	import { homepageSeen } from '$lib/store/homepageSeen.js';
 	import { viewTypeList } from '$lib/store/userPreferences.js';
 	import { Lightbulb, Plus } from 'lucide-svelte';
 
@@ -13,6 +14,8 @@
 	afterNavigate(() => {
 		// Get a random tip from the tips.json file
 		randomTip = tips[Math.floor(Math.random() * tips.length)];
+
+		homepageSeen.set(true);
 	});
 </script>
 
