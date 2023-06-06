@@ -101,6 +101,7 @@
 	$: if ($hotkeysEnabled) document.addEventListener('keydown', handleKeyDown, true);
 	else document.removeEventListener('keydown', handleKeyDown, true);
 	onDestroy(() => {
+		if (helloTimer) clearInterval(helloTimer);
 		bc?.close();
 		document.removeEventListener('keydown', handleKeyDown, true);
 	});
