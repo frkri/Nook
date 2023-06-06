@@ -6,7 +6,7 @@
 	import ActionModal from '$lib/components/popup/actionModal.svelte';
 	import DeleteEntryModal from '$lib/components/popup/deleteEntryModal.svelte';
 	import { currentPath } from '$lib/store/currentPath';
-	import { Edit, MoreVertical, Trash } from 'lucide-svelte';
+	import { Copy, Edit, MoreVertical, Trash } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
 	export let entry: EntryData;
@@ -45,6 +45,15 @@
 		}}
 	>
 		<Edit /> Edit
+	</button>
+	<button
+		class="button secondary"
+		on:click={() => {
+			navigator.clipboard.writeText(entry.id);
+			modalItemOptionsOpen = false;
+		}}
+	>
+		<Copy /> Copy ID
 	</button>
 	<button
 		class="button secondary"
