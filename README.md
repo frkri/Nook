@@ -2,7 +2,7 @@
 
 ⚠️ Learning Project! ⚠️
 
-Basic notetaking app (clientside) made with [SvelteKit](https://kit.svelte.dev), which has an _editor_ with markdown support and an explorer with a file system-like browser.
+Basic notetaking app (clientside and fully offline) made with [SvelteKit](https://kit.svelte.dev), it features an editor with markdown support and an explorer with a file system-like browser.
 
 It uses [OPFS](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API#origin_private_file_system) and [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for storage.
 
@@ -16,7 +16,7 @@ Design based on [Geist](https://github.com/geist-org/geist-ui), originating from
 
 _Make sure you have [Node.js](https://nodejs.org) (v16 or v18) installed to run locally!_
 
-_Optional: [pnpm](https://pnpm.io/) instead of NPM_
+_Optional: [PNPM](https://pnpm.io/) instead of NPM_
 
 ```bash
 git clone https://github.com/frkri/Nook.git
@@ -29,7 +29,7 @@ npm install
 Dev: Starts Vite server and opens site in browser
 
 ```bash
-npm run dev --open
+npm run dev -- --open
 ```
 
 Building: uses [@sveltejs/adapter-vercel](https://kit.svelte.dev/docs/adapter-vercel)
@@ -41,7 +41,7 @@ npm run build
 ...then run preview
 
 ```bash
-npm run preview --open
+npm run preview -- --open
 ```
 
 ### Notice
