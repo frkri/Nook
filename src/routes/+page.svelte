@@ -19,7 +19,6 @@
 	let importUrl = '';
 
 	onMount(async () => {
-		homepageSeen.set(true);
 		recent = (await getEntriesByID($recentFiles)) as EntryData[];
 		dirHandle = await navigator.storage.getDirectory();
 
