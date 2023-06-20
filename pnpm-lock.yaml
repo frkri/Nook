@@ -1,12 +1,16 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   idb:
     specifier: ^7.1.1
     version: 7.1.1
   lucide-svelte:
-    specifier: ^0.129.0
-    version: 0.129.0(svelte@3.59.1)
+    specifier: ^0.246.0
+    version: 0.246.0(svelte@3.59.1)
   snarkdown:
     specifier: ^2.0.0
     version: 2.0.0
@@ -1538,8 +1542,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /lucide-svelte@0.129.0(svelte@3.59.1):
-    resolution: {integrity: sha512-WSmxgL+B/3p7K1d86nk9O/xw8t8MxtLubHCkxFlimmo4NSCDLZuGGQifwKNC0NJ1n10BAVFdPW+SMI1611ucuQ==}
+  /lucide-svelte@0.246.0(svelte@3.59.1):
+    resolution: {integrity: sha512-wAuFC8WUeRUaVli9xvSkrngD3nHrBI4Z/8Pq+Tu/FS4OqeKOWiUk5kCX35g97vAbbzjrgDGAPgRxImBzB2rLHg==}
     peerDependencies:
       svelte: ^3.49.0
     dependencies:
