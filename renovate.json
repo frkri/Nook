@@ -8,9 +8,9 @@
 	"includeForks": true,
 	"packageRules": [
 		{
-			"matchDepTypes": ["devDependencies"],
-			"automerge": true,
-			"postUpdateOptions": ["pnpmDedupe"]
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
 		}
 	]
 }
