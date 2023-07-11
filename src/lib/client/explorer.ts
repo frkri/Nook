@@ -227,19 +227,18 @@ export async function getFileEntryHandle(
 }
 
 /**
- * Returns the contents of a file as a string in Base64 or UTF-8
+ * Returns the contents of a file in String or ArrayBuffer format
  * @param fileHandle
  * @param fileType
- * @returns A string containing the contents of the file in Base64 or UTF-8
  */
 export async function readEntryContents(
 	fileHandle: FileSystemFileHandle,
 	fileType?: EntryType
-): Promise<string> {
+): Promise<string | ArrayBuffer> {
 	const file = await fileHandle.getFile();
 
 	if (fileType === 'note') return await file.text();
-	else return await createBase64FromBuffer(await file.arrayBuffer());
+	else return await file.arrayBuffer();
 }
 
 export async function writeEntryContents(
@@ -347,11 +346,12 @@ export async function exportEntry(parentHandle: FileSystemDirectoryHandle) {
 	for await (const entry of entries) {
 		if (entry.type !== 'directory') {
 			const childHandle = await parentHandle.getFileHandle(entry.id);
-			const childData = await readEntryContents(childHandle, entry.type);
+			let childData = await readEntryContents(childHandle, entry.type);
+			if (entry.type != 'note') childData = await createBase64FromBuffer(childData as ArrayBuffer);
 
 			exportData.children.push({
 				...entry,
-				content: childData
+				content: childData as string
 			});
 		} else if (entry.type === 'directory') {
 			const childData = await exportEntry(await parentHandle.getDirectoryHandle(entry.id));

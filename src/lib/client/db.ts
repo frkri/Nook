@@ -1,6 +1,7 @@
 import type { EntryData } from '$lib/types';
 
 import { browser, building } from '$app/environment';
+import { error } from '@sveltejs/kit';
 import { openDB, type DBSchema } from 'idb';
 
 interface NookDB extends DBSchema {
@@ -12,9 +13,7 @@ interface NookDB extends DBSchema {
 }
 
 async function initDB(dbName: string, dbVersion: number) {
-	//if (!browser) throw new Error("IndexedDB isn't available in this environment");
 	if (building || !browser) return;
-
 	const db = await openDB<NookDB>(dbName, dbVersion, {
 		upgrade(db) {
 			const store = db.createObjectStore('entries', {
