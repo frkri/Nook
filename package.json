@@ -38,7 +38,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"idb": "^7.1.1",
+		"idb": "^8.0.0",
 		"lucide-svelte": "^0.292.0",
 		"snarkdown": "^2.0.0"
 	}
