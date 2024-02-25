@@ -27,7 +27,7 @@ devDependencies:
     version: 0.5.9(tailwindcss@3.3.2)
   '@types/wicg-file-system-access':
     specifier: ^2023.0.0
-    version: 2023.10.0
+    version: 2023.10.4
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.0.0
     version: 6.0.0(@typescript-eslint/parser@6.0.0)(eslint@8.43.0)(typescript@5.1.6)
@@ -663,8 +663,8 @@ packages:
     resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
     dev: true
 
-  /@types/wicg-file-system-access@2023.10.0:
-    resolution: {integrity: sha512-grp7HBsK3ypYBh2zf/ChIYi8FA44REm7/k4+wa7wN5Y2wBoEbEThTW3UfSxpbaRP44ddOapamnLS3CtM60SkvA==}
+  /@types/wicg-file-system-access@2023.10.4:
+    resolution: {integrity: sha512-ewOj7hWhsUTS2+aY6zY+7BwlgqGBj5ZXxKuHt3TAWpIJH0bDW/6bO1N1SdUDAzV8r0Nc+/ZtpAEETYTwrehBMw==}
     dev: true
 
   /@typescript-eslint/eslint-plugin@6.0.0(@typescript-eslint/parser@6.0.0)(eslint@8.43.0)(typescript@5.1.6):
