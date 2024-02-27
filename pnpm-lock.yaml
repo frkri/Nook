@@ -69,7 +69,7 @@ devDependencies:
     version: 3.6.4(postcss@8.4.35)(svelte@4.2.12)
   svelte-feather-icons:
     specifier: ^4.0.1
-    version: 4.0.1
+    version: 4.1.0
   svelte-portal:
     specifier: ^2.2.0
     version: 2.2.1
@@ -2567,8 +2567,8 @@ packages:
       svelte: 4.2.12
     dev: true
 
-  /svelte-feather-icons@4.0.1:
-    resolution: {integrity: sha512-DMDrlbblaRUHLcTFtKHE4GWQ/Fk/kneGIZrrI75EmTxCu1hgHe8uq8e80ONrmdjL/i3f1d8fkcx73SWng2X6Gg==}
+  /svelte-feather-icons@4.1.0:
+    resolution: {integrity: sha512-fcTL4VzEN4BoccQJjKiui0b9DWEsmO6zGpI0tQTJbthRtNrYheoU487zyA1BD8rj9kj6jbKGmGVo7zbSdRvMvA==}
     dependencies:
       svelte: 3.59.2
     dev: true
