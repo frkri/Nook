@@ -56,11 +56,11 @@ devDependencies:
     specifier: ^3.2.2
     version: 3.2.4(prettier@2.8.8)(typescript@5.4.3)
   prettier-plugin-svelte:
-    specifier: ^2.10.1
-    version: 2.10.1(prettier@2.8.8)(svelte@4.2.12)
+    specifier: ^3.0.0
+    version: 3.2.2(prettier@2.8.8)(svelte@4.2.12)
   prettier-plugin-tailwindcss:
     specifier: ^0.3.0
-    version: 0.3.0(prettier-plugin-organize-imports@3.2.4)(prettier-plugin-svelte@2.10.1)(prettier@2.8.8)
+    version: 0.3.0(prettier-plugin-organize-imports@3.2.4)(prettier-plugin-svelte@3.2.2)(prettier@2.8.8)
   svelte:
     specifier: ^4.0.1
     version: 4.2.12
@@ -2489,17 +2489,17 @@ packages:
       typescript: 5.4.3
     dev: true
 
-  /prettier-plugin-svelte@2.10.1(prettier@2.8.8)(svelte@4.2.12):
-    resolution: {integrity: sha512-Wlq7Z5v2ueCubWo0TZzKc9XHcm7TDxqcuzRuGd0gcENfzfT4JZ9yDlCbEgxWgiPmLHkBjfOtpAWkcT28MCDpUQ==}
+  /prettier-plugin-svelte@3.2.2(prettier@2.8.8)(svelte@4.2.12):
+    resolution: {integrity: sha512-ZzzE/wMuf48/1+Lf2Ffko0uDa6pyCfgHV6+uAhtg2U0AAXGrhCSW88vEJNAkAxW5qyrFY1y1zZ4J8TgHrjW++Q==}
     peerDependencies:
-      prettier: ^1.16.4 || ^2.0.0
-      svelte: ^3.2.0 || ^4.0.0-next.0
+      prettier: ^3.0.0
+      svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
     dependencies:
       prettier: 2.8.8
       svelte: 4.2.12
     dev: true
 
-  /prettier-plugin-tailwindcss@0.3.0(prettier-plugin-organize-imports@3.2.4)(prettier-plugin-svelte@2.10.1)(prettier@2.8.8):
+  /prettier-plugin-tailwindcss@0.3.0(prettier-plugin-organize-imports@3.2.4)(prettier-plugin-svelte@3.2.2)(prettier@2.8.8):
     resolution: {integrity: sha512-009/Xqdy7UmkcTBpwlq7jsViDqXAYSOMLDrHAdTMlVZOrKfM2o9Ci7EMWTMZ7SkKBFTG04UM9F9iM2+4i6boDA==}
     engines: {node: '>=12.17.0'}
     peerDependencies:
@@ -2553,7 +2553,7 @@ packages:
     dependencies:
       prettier: 2.8.8
       prettier-plugin-organize-imports: 3.2.4(prettier@2.8.8)(typescript@5.4.3)
-      prettier-plugin-svelte: 2.10.1(prettier@2.8.8)(svelte@4.2.12)
+      prettier-plugin-svelte: 3.2.2(prettier@2.8.8)(svelte@4.2.12)
     dev: true
 
   /prettier@2.8.8:
