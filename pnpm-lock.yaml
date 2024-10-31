@@ -71,7 +71,7 @@ importers:
         version: 3.8.6(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@4.2.19)
       svelte-feather-icons:
         specifier: ^4.0.1
-        version: 4.1.0
+        version: 4.2.0
       svelte-portal:
         specifier: ^2.2.0
         version: 2.2.1
@@ -1710,8 +1710,8 @@ packages:
       svelte:
         optional: true
 
-  svelte-feather-icons@4.1.0:
-    resolution: {integrity: sha512-fcTL4VzEN4BoccQJjKiui0b9DWEsmO6zGpI0tQTJbthRtNrYheoU487zyA1BD8rj9kj6jbKGmGVo7zbSdRvMvA==}
+  svelte-feather-icons@4.2.0:
+    resolution: {integrity: sha512-KuMTDrL6sA8aCxBv3RMgmmnnyIaAXaYcmWkmNa2r2Qj70vi+An2T6ZBAdiZr6wjx+a3eZJy+FRseeRkzQFGHPw==}
 
   svelte-hmr@0.15.3:
     resolution: {integrity: sha512-41snaPswvSf8TJUhlkoJBekRrABDXDMdpNpT2tfHIv4JuhgvHqLMhEPGtaQn0BmbNSTkuz2Ed20DF2eHw0SmBQ==}
@@ -3399,7 +3399,7 @@ snapshots:
     optionalDependencies:
       svelte: 4.2.19
 
-  svelte-feather-icons@4.1.0:
+  svelte-feather-icons@4.2.0:
     dependencies:
       svelte: 3.59.2
 
